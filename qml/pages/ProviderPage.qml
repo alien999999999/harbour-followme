@@ -97,11 +97,17 @@ Page {
 			onStarted: entryModel = [];
 			
 			onReceived: {
-				entryModel.push(entry);
-				favList.model = entryModel;
+				console.log('found entry ' + entry.id);
 			}
 
-			onDone: favList.loading = false;
+			onDone: {
+				if (success) {
+					console.log('found ' + entries.length + ' entries');
+					entryModel = entries;
+					favList.model = entryModel;
+				}
+				favList.loading = false;
+			}
 		}
 	}
 }
