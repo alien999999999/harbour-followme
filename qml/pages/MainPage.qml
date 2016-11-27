@@ -184,7 +184,6 @@ Page {
 				if (entry.label == undefined) {
 					entry.label = item.id;
 				}
-				console.log("receiving: " + entry.label);
 				if (entry.last == undefined) {
 					entry.last = -1;
 				}
@@ -204,6 +203,9 @@ Page {
 				entryList.loading = false;
 				entryList.firstTime = (entries.length == 0);
 				// show update entries
+				entryModel.sort(function (a,b) {
+					return ( a.last == a.total ? 1 : (a.last != undefined && a.last > 0 ? -1 : 0)) - ( b.last == b.total ? 1 : (b.last != undefined && b.last > 0 ? -1 : 0));
+				});
 				entryList.model = entryModel;
 			}
 		}
