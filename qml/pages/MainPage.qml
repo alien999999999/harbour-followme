@@ -204,7 +204,7 @@ Page {
 				entryList.firstTime = (entries.length == 0);
 				// show update entries
 				entryModel.sort(function (a,b) {
-					return ( a.last == a.total ? 1 : (a.last != undefined && a.last > 0 ? -1 : 0)) - ( b.last == b.total ? 1 : (b.last != undefined && b.last > 0 ? -1 : 0));
+					return (a.last != undefined && a.last > 0 ? (a.last == a.total ? 1 : -1) : 0) - (b.last != undefined && b.last > 0 ? (b.last == b.total ? 1 : -1) : 0);
 				});
 				entryList.model = entryModel;
 			}
