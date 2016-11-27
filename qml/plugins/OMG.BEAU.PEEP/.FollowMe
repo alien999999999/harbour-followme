@@ -1,0 +1,54 @@
+{
+	'label': "OMG.BEAU.PEEP",
+	'url': "http://www.omgbeaupeep.com/comics/",
+	'levels': [
+		{
+			'label': "Comics",
+			'preFilter': '<select name="manga"[^<]+><option value="0">[^<]+</option>',
+			'filter': '<option value="(.+?)">(.+?)</option>',
+			'filterName': 2,
+			'filterFile': 1,
+			'filePrefix': "",
+			'fileSuffix': "/",
+			'fileCumulative': True,
+			'filePrefixBase': False,
+			'type': "list"
+		},
+		{
+			'label': "Comic",
+			'preFilter': '<select name="chapter"[^<]+>',
+			'filter': '<option value="(.+?)"[^>]*>.+?</option>',
+			'filterName': 1,
+			'filterFile': 1,
+			'filePrefix': "",
+			'fileSuffix': "/",
+			'fileCumulative': True,
+			'filePrefixBase': False,
+			'type': "list"
+		},
+		{
+			'label': "Chapter",
+			'preFilter': '<select name="page"[^<]+>',
+			'filter': '<option value="(.+?)"[^>]*>.+?</option>',
+			'filterName': 1,
+			'filterFile': 1,
+			'filePrefix': "",
+			'fileSuffix': "/",
+			'fileCumulative': True,
+			'filePrefixBase': False,
+			'type': "entry"
+		},
+		{
+			'label': "Page",
+			'preFilter': '',
+			'filter': '<img src="(mangas/[^"]+)"[^>]+class="picture" /></a>',
+			'filterName': 1,
+			'filterFile': 1,
+			'filePrefix': "",
+			'fileSuffix': "",
+			'fileCumulative': False,
+			'filePrefixBase': True,
+			'type': "part"
+		}
+	]
+}
