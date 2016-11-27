@@ -180,11 +180,11 @@ Page {
 			onStarted: entryList.loading = true;
 				
 			onEntryReceived: {
-				console.log("receiving: " + entry.filename);
 				// TODO: inserted Sorting using the insert!
 				if (entry.label == undefined) {
-					entry.label = item.filename;
+					entry.label = item.id;
 				}
+				console.log("receiving: " + entry.label);
 				if (entry.last == undefined) {
 					entry.last = -1;
 				}
