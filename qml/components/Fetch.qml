@@ -4,7 +4,7 @@ import Sailfish.Silica 1.0
 Ajax {
 	property var locator
 	property var plugin: plugins[locator[0]]
-	property var level: plugin.levels[locator.length - 1]
+	property var level: plugin != undefined ? plugin.levels[locator.length - 1] : undefined
 	property bool fetchautostart
 	autostart: false
 
@@ -66,20 +66,22 @@ Ajax {
 	}
 
 	Component.onCompleted: {
-		url = '';
-		var i = locator.length - 1;
-		while (i > 0) {
-			var u = locator[i];
-			i--;
-			url = plugin.levels[i].filePrefix + u + plugin.levels[i].fileSuffix + url;
-			if (!plugin.levels[i].fileCumulative) {
-				break;
+		if (plugin != undefined) {
+			url = '';
+			var i = locator.length - 1;
+			while (i > 0) {
+				var u = locator[i];
+				i--;
+				url = plugin.levels[i].filePrefix + u + plugin.levels[i].fileSuffix + url;
+				if (!plugin.levels[i].fileCumulative) {
+					break;
+				}
 			}
-		}
-		url = plugin.url + url;
-		if (fetchautostart) {
-			console.log('fetching "' + url + '"');
-			activate();
+			url = plugin.url + url;
+			if (fetchautostart) {
+				console.log('fetching "' + url + '"');
+				activate();
+			}
 		}
 	}
 }

@@ -10,7 +10,7 @@ ApplicationWindow
 	id: "app"
 
 	property string dataPath: "~/sdcard/.FollowMe"
-	property string pluginPath: "plugins"
+	property string pluginPath: "/usr/share/harbour-followme/qml/plugins"
 	property bool dirtyList
 	property var ps: pageStack
 	property var plugins: ({})
