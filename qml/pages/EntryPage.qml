@@ -206,17 +206,13 @@ Page {
 
 	onGotoSibling: {
 		console.log('gotoSibling(' + number + '): ' + entryPage.siblings[number - 1].id);
-		var l = entryPage.locator;
-		l.splice(entryPage.locator.length - 1, 1, entryPage.siblings[number - 1].id);
-		for (var i in l) { console.log(' - ' + i + ': ' + l[i]); }
-		pageStack.replace(Qt.resolvedUrl("EntryPage.qml"), {
-			locator: l,
-			current: number,
-			prev: number - 1 > 0 ? number - 1 : -1,
-			next: number + 1 < entryPage.siblings.length ? number + 1 : -1,
-			name: entryPage.name,
-			siblings: entryPage.siblings,
-			parentEntry: entryPage.parentEntry
-		});
+		entryView.model = [];
+		entryPage.locator.splice(entryPage.locator.length - 1, 1, entryPage.siblings[number - 1].id);
+		entryPage.current = number;
+		entryPage.prev = number - 1 > 0 ? number - 1 : -1;
+		entryPage.next = number + 1 < entryPage.siblings.length ? number + 1 : -1;
+		entryView.model = partItems;
+		loadChapter.activate();
+		// i wonder if some kind of refresh is needed...
 	}
 }
