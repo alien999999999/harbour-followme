@@ -53,7 +53,7 @@ Page {
 			partIndex: index
 			partId: part.id
 			file: part.file
-			absoluteFile: part.absoluteFile
+			absoluteFile: part.absoluteFile != undefined ? part.absoluteFile : ''
 
 			DownloadPage {
 				id: "reDownloadPage"
