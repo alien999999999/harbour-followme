@@ -78,6 +78,9 @@ Ajax {
 				}
 			}
 			url = plugin.url + url;
+			if (locator.length > 0 && locator.length <= plugin.levels.length && plugin.levels[locator.length - 1].pathSuffix != undefined) {
+				url = url + plugin.levels[locator.length - 1].pathSuffix;
+			}
 			if (fetchautostart) {
 				console.log('fetching "' + url + '"');
 				activate();
