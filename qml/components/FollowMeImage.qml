@@ -23,7 +23,7 @@ ListItem {
 		width: parent.width
 		height: ready ? imageFile.sourceSize.height * width / imageFile.sourceSize.width : 0
 		Component.onCompleted: {
-			if (imageFile.status === Image.Error) {
+			if (imageFile.status === Image.Error || absoluteFile == '') {
 				// fetch online
 				console.log("error in image " + absoluteFile);
 				imageError(listItem.parentLocator, listItem.partIndex, listItem.partId);

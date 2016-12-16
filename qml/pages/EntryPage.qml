@@ -6,7 +6,7 @@ Page {
 	id: "entryPage"
 	property string name
 	property var locator
-	property string label: locator[locator.length - 1]
+	property string label: locator[locator.length - 1].label
 	property int prev
 	property int current
 	property int next
@@ -15,11 +15,8 @@ Page {
 	property var chapter: ({id: siblings[current - 1].id, label: siblings[current - 1].label, items: []})
 	property var partItems: chapter.items
 
-	property var downloadPagesComponent: Qt.createComponent("../components/DownloadPages.qml");
-	property var downloadPages
-
 	signal gotoSibling (int number)
-	signal markRead ()
+	signal markRead (bool force)
 	signal markLast ()
 
 	allowedOrientations: Orientation.Portrait | Orientation.Landscape
@@ -49,7 +46,7 @@ Page {
 		delegate: FollowMeImage {
 			property var part: partItems[index]
 			width: parent.width
-			parentLocator: locator
+			parentLocator: entryPage.locator
 			partIndex: index
 			partId: part.id
 			file: part.file
@@ -57,26 +54,37 @@ Page {
 
 			DownloadPage {
 				id: "reDownloadPage"
-				locator: parentLocator.concat([part.id])
-				chapter: siblings[current - 1]
-				pageIndex: part.id
-				pageList: partItems
-				force: true;
+				locator: parentLocator.concat([{id: part.id, file: part.file, label: part.label}])
+				chapter: entryPage.chapter
+				pageIndex: partIndex
+				pageList: [] //TODO: need to get the page list from disk!
 
 				onDone: {
-					console.log('re-fetched file');
-					//part.absoluteFile = ;
+					if (part.absoluteFile != undefined) {
+						absoluteFile = part.absoluteFile;
+						// TODO: avoid this, by prechecking the absoluteFile and saving the chapter with it.
+						saveChapter.activate();
+					}
+					console.log('re-fetched file complete');
+					console.log('remoteFile = ' + chapter.items[pageIndex]['remoteFile']);
+					console.log('absoluteFile = ' + chapter.items[pageIndex]['absoluteFile']);
+					console.log('part.absoluteFile = ' + part['absoluteFile']);
+					console.log('reDownloadPage might need some reinitialize to redraw image');
 				}
 			}
 
 			onImageError: {
+				console.log("image has error, redownloading it...");
 				reDownloadPage.activate();
 			}
 
 			menu: ContextMenu {
 				MenuItem {
 					text: "Refresh"
-					onClicked: reDownloadPage.activate();
+					onClicked: {
+						reDownloadPage.force = true;
+						reDownloadPage.activate();
+					}
 				}
 			}
 		}
@@ -129,7 +137,7 @@ Page {
 		entry: entryPage.chapter
 
 		onFinished: {
-			console.log('saving chapter [' + locator.join(',') + ']: ' + (success ? "ok" : "nok"));
+			console.log('saving chapter [' + locator.length + ']: ' + (success ? "ok" : "nok"));
 			app.dirtyList = true;
 		}
 	}
@@ -141,30 +149,25 @@ Page {
 		entry: entryPage.parentEntry
 
 		onFinished: {
-			console.log('saving entry [' + locator.join(',') + ']: ' + (success ? "ok" : "nok"));
+			console.log('saving entry [' + locator.length + ']: ' + (success ? "ok" : "nok"));
 			app.dirtyList = true;
 		}
 	}
 
-	Fetch {
-		id: "fetchPages"
+	DownloadChapter {
+		id: "downloadChapter"
 		locator: entryPage.locator
+		chapter: entryPage.chapter
+		nodownload: true
 
 		onDone: {
-			console.log("done fetching pages: create a downloadPages component, to get the actual pages...");
-			downloadPages = downloadPagesComponent.createObject(entryPage, {
-				base: app.dataPath,
-				locator: entryPage.locator,
-				outModel: partItems,
-				inModel: entries,
-				donePagesHandler: function () {
-					console.log("done: " + partItems.length);
-					markRead();
-					console.log("saving to chapter: " + entryPage.current);
-					markLast();
-					entryView.model = partItems;
-				}
-			});
+			// force saving while marking as read
+			markRead(true);
+			console.log("chapter items: " + chapter.items.length);
+			console.log("saving to chapter: " + entryPage.current);
+			markLast();
+			partItems = chapter.items;
+			entryView.model = partItems;
 		}
 	}
 
@@ -183,22 +186,30 @@ Page {
 				entryView.model = partItems;
 				console.log("saving to chapter: " + entryPage.current);
 				// mark it as read
-				markRead();
+				markRead(false);
 				return ;
 			}
 			// fetch them online (not from dir)
-			console.log('fetching pages');
-			fetchPages.activate();
+			console.log('downloading chapter');
+			downloadChapter.activate();
 		}
 	}
 
 	onMarkRead: {
+		// no need to save if already read
+		if (chapter.read != undefined && chapter.read && !force) {
+			return ;
+		}
 		// mark chapter read
 		chapter.read = true;
 		saveChapter.activate();
 	}
 
 	onMarkLast: {
+		// no need to save parentEntry if this was the last one
+		if (parentEntry.last != undefined && parentEntry.last == current) {
+			return ;
+		}
 		// save last entry
 		parentEntry.last = current;
 		saveEntry.activate();
@@ -207,7 +218,7 @@ Page {
 	onGotoSibling: {
 		console.log('gotoSibling(' + number + '): ' + entryPage.siblings[number - 1].id);
 		entryView.model = [];
-		entryPage.locator.splice(entryPage.locator.length - 1, 1, entryPage.siblings[number - 1].id);
+		entryPage.locator.splice(entryPage.locator.length - 1, 1, {id: entryPage.siblings[number - 1].id, label: entryPage.siblings[number - 1].label, file: entryPage.siblings[number - 1].file});
 		entryPage.current = number;
 		entryPage.prev = number - 1 > 0 ? number - 1 : -1;
 		entryPage.next = number + 1 < entryPage.siblings.length ? number + 1 : -1;

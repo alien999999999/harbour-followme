@@ -7,9 +7,12 @@ Item {
 
 	property var xhr: new XMLHttpRequest
 
+	signal started ()
 	signal finished (string data)
 
 	function activate() {
+		started();
+		console.log("Ajax.activate(): getting url '" + url + "'...");
 		xhr.open("GET", url);
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState == XMLHttpRequest.DONE) {

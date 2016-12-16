@@ -11,7 +11,7 @@
 			'filePrefix': "",
 			'fileSuffix': "/",
 			'fileCumulative': True,
-			'filePrefixBase': False,
+			'filePrefixBase': True,
 			'type': "list"
 		},
 		{

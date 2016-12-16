@@ -18,6 +18,8 @@ Python {
 		addImportPath(Qt.resolvedUrl('../../python'));
 		importModule('followme', function () {
 			started();
+			console.log('ListEntries: locator: ' + locator.length);
+			console.log(locator);
 			call('followme.listData', [base, locator, files, excludes, event, depth], function (result) {
 				finished(result != null, result);
 			});

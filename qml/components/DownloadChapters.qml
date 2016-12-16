@@ -37,7 +37,7 @@ Item {
 		for (var i = from; i <= to; i++) {
 			console.log('chapter: ' + chapters[i - 1].id);
 			var o = downloadChapterComponent.createObject(null, {
-				locator: locator.concat([chapters[i - 1].id]),
+				locator: locator.concat([{id: chapters[i - 1].id, file: chapters[i - 1].file, label: chapters[i - 1].label}]),
 				chapter: {
 					id: chapters[i - 1].id, 
 					label: chapters[i - 1].label,

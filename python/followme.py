@@ -1,10 +1,13 @@
 import pyotherside
 import os
 
+# helper function to find the resulting folder from the locator (and base)
 def locateFolder(base, locator):
     folder = os.path.expanduser(base)
-    return os.path.join(folder, '/'.join(locator))
+    return os.path.join(folder, '/'.join([x['id'].replace('/','-') for x in locator]))
 
+# list files or directories from a certain locator (and in a certain depth)
+# send event for each item
 def listData(base, locator, files = False, excludes = [], event = "received", depth = 1):
     entries = []
     folder = locateFolder(base, locator)
@@ -18,9 +21,11 @@ def listData(base, locator, files = False, excludes = [], event = "received", de
             absoluteFile = os.path.join(folder, name)
             dir = os.path.isdir(absoluteFile)
             l = list(locator)
-            l.append(name)
+            l.append({'id': name})
             if depth == 1:
+                # depth == 1, so we're at the end of the depth
                 if dir and not files:
+                    # we're looking for directories
                     entry = loadData(base, l);
                     if not entry:
                         entry = {}
@@ -31,11 +36,13 @@ def listData(base, locator, files = False, excludes = [], event = "received", de
                     pyotherside.send(event, entry)
                     entries.append(entry)
                 elif not dir and files:
+                    # we're looking for files
                     entry = {'locator': l, 'file': name, 'absoluteFile': absoluteFile}
                     pyotherside.send(event, entry)
                     entries.append(entry)
             else:
                 if dir and depth > 1:
+                    # call itself recursively with one less depth
                     entries += listData(base, l, files, excludes, event, depth - 1)
     return entries
 
@@ -44,25 +51,35 @@ def loadData(base, locator):
     filename = folder + '/.FollowMe'
     try:
         f = open(filename, 'r')
-        settings = eval(f.read())
+        entry = eval(f.read())
         f.close()
-        settings['locator'] = locator
+        if 'parent' in entry:
+            entry['locator'] = entry['parent']
+            del entry['parent']
+            entry['locator'].append(locator[-1])
+        if 'locator' not in entry:
+            entry['locator'] = locator
+        if 'file' in entry and 'file' not in entry['locator'][-1]:
+            entry['locator'][-1]['file'] = entry['file']
+        if 'label' in entry and 'label' not in entry['locator'][-1]:
+            entry['locator'][-1]['label'] = entry['label']
     except:
         pass
-        settings = False
-    return settings
+        entry = False
+    return entry
 
-def saveData(base, locator, settings):
+def saveData(base, locator, entry):
     folder = locateFolder(base, locator)
     os.makedirs(folder, exist_ok = True)
     filename = folder + '/.FollowMe'
-    entries = dict(settings)
-    if 'locator' in entries:
-        del entries['locator']
+    entry = dict(entry)
+    entry['parent'] = locator[:-1]
+    if 'locator' in entry:
+        del entry['locator']
     r = True
     try:
         f = open(filename, 'w')
-        f.write(str(entries))
+        f.write(str(entry))
         f.close()
     except:
         pass
@@ -70,13 +87,13 @@ def saveData(base, locator, settings):
     return r
 
 def downloadData(base, locator, suffix, remotefile):
-    filename = locator.pop()
+    fileitem = locator.pop()
     folder = locateFolder(base, locator)
     try:
         os.makedirs(folder, exist_ok = True)
     except FileExistsError:
         pass
-    filename = folder + '/' + filename + suffix
+    filename = folder + '/' + fileitem['id'].replace('/','-') + suffix
     if os.path.isfile(filename):
         return filename
     try:
@@ -86,7 +103,7 @@ def downloadData(base, locator, suffix, remotefile):
         f.write(img.read())
         f.close()
     except:
-        pass
+        raise
         filename = False
     return filename
 

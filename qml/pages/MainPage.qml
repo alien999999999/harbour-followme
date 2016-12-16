@@ -10,6 +10,7 @@ Page {
 	property var entryModel: []
 
 	signal gotoEntry (var entry)
+	signal refreshList ()
 
 	SilicaListView {
 		id: "entryList"
@@ -70,11 +71,15 @@ Page {
 		model: entryModel
 
 		delegate: FollowMeItem {
+			id: 'followMeItem'
+
 			property var entryItem: entryModel[index]
 			property var ps: app.ps
 
+			signal markUnWanted (bool force)
+
 			primaryText: entryItem.label
-			secondaryText: entryItem.provider
+			secondaryText: entryItem.locator[0].label
 			starred: ( entryItem.last < entryItem.total )
 			last: entryItem.last
 			total: entryItem.total
@@ -83,24 +88,28 @@ Page {
 
 			onClicked: {
 				if (entryItem.items.length == 0) {
+					console.log("clicked on item " + entryItem.label + ", but first we need to find the number of chapters");
 					// TODO: fetch online + retry only once
 					fetchChapters.gotopage = true;
 					fetchChapters.activate();
 					return ;
 				}
+				console.log("clicked on item " + entryItem.label + ", going to EntryPage");
 				gotoEntry(entryItem);
 			}
 
 			Fetch {
 				id: "fetchChapters"
 				locator: entryItem.locator
-				fetchautostart: entryItem.items.length == 0
 
 				property bool gotopage
 
+				onStarted: entryItem.items = [];
+
+				onReceived: entryItem.items.push({id: entry.id, file: entry.file, label: entry.label});
+
 				onDone: {
 					if (success) {
-						entryItem.items = entries;
 						entryItem.items.sort(function (a,b) {
 							return ( a.id < b.id ? -1 : (a.id > b.id ? 1 : 0));
 						});
@@ -128,16 +137,24 @@ Page {
 				onDone: console.log("chapters are downloaded: " + (success ? "ok" : "nok"));
 			}
 
+			onMarkUnWanted: {
+				if (!entryItem.want) {
+					entryItem.want = false;
+					saveEntry.activate();
+					followMeItem.height = 0;
+				}
+			}
+
 			menu: ContextMenu {
 				MenuItem {
-					visible: (entryItem.provider in app.plugins)
+					visible: (entryItem.locator[0].id in app.plugins)
 					text: qsTr("Check updates")
 					onClicked: {
 						fetchChapters.activate();
 					}
 				}
 				MenuItem {
-					visible: (entryItem.provider in app.plugins) && (last > 0) && (total > 0)
+					visible: (entryItem.locator[0].id in app.plugins) && (last > 0) && (total > 0)
 					text: qsTr("Download some chapters")
 					onClicked: {
 						var dialog = pageStack.push(Qt.resolvedUrl("SliderDialog.qml"), {
@@ -159,6 +176,7 @@ Page {
 					text: qsTr("Stop following")
 					onClicked: {
 						//remorseTimer
+						markUnWanted(false);
 					}
 				}
 			}
@@ -170,7 +188,7 @@ Page {
 			id: "listEntries"
 			base: app.dataPath
 			locator: []
-			autostart: true
+			//autostart: true
 			depth: 2
 			event: "entryReceived"
 			eventHandler: entryReceived
@@ -193,8 +211,12 @@ Page {
 				if (entry.items == undefined) {
 					entry.items = [];
 				}
-				entry.provider = entry.locator[0];
-				entryModel.push(entry);
+				if (entry.locator[0].label == undefined) {
+					entry.locator[0].label = entry.locator[0].id;
+				}
+				if (entry.want == undefined || entry.want) {
+					entryModel.push(entry);
+				}
 
 				// TODO: find something to display updated entryModel
 			}
@@ -220,7 +242,7 @@ Page {
 		console.log('go to entry with id: ' + entry.items[entry.last - 1].id);
 		// TODO: save the last entry in EntryPage
 		ps.push(Qt.resolvedUrl("EntryPage.qml"), {
-			locator: entry.locator.concat([entry.items[entry.last - 1].id]),
+			locator: entry.locator.concat([{id: entry.items[entry.last - 1].id, label: entry.items[entry.last - 1].label, file: entry.items[entry.last - 1].file}]),
 			current: entry.last,
 			prev: entry.last > 1 ? entry.last - 1 : -1,
 			next: entry.last < entry.total ? entry.last + 1 : -1,
@@ -230,17 +252,27 @@ Page {
 		});
 	}
 
+	onRefreshList: {
+		entryList.loading = true;
+		entryList.model = [];
+		entryModel = [];
+		entryList.model = entryModel;
+		console.log("reloading list");
+		listEntries.activate();
+		app.dirtyList = false;
+	}
+
 	onStatusChanged: {
-		if (status == 2) {
-			if (app.dirtyList) {
-				entryList.loading = true;
-				entryList.model = [];
-				entryModel = [];
-				entryList.model = entryModel;
-				console.log("reloading list");
-				listEntries.activate();
-				app.dirtyList = false;
-			}
+		console.log('status changed: ' + status);
+		console.log('list dirty: ' + app.dirtyList);
+		console.log('plugins ready: ' + app.pluginsReady);
+		if (status == 1 && app.dirtyList && app.pluginsReady) {
+			console.log("status changed and main list is dirty and plugins were ready");
+			refreshList();
 		}
+	}
+
+	Component.onCompleted: {
+		app.pluginsCompleted.connect(refreshList);
 	}
 }

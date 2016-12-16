@@ -7,7 +7,7 @@ Page {
 	allowedOrientations: Orientation.Portrait | Orientation.Landscape
 
 	property var provider
-	property var locator: [provider]
+	property var locator: [{id: provider, label: app.plugins[provider].label}]
 	property int level: locator.length
 	property var entryModel: []
 
@@ -54,19 +54,21 @@ Page {
 
 		delegate: FollowMeItem {
 			// TODO: no loading, no last, no total, contextmenu
+			id: "followMeItem"
 			property var entryItem: entryModel[index]
 			primaryText: entryItem.label != undefined ? entryItem.label : entryItem.id
 			starred: (entryItem.want != undefined && entryItem.want)
-			locator: [provider, entryItem.id]
+			locator: entryItem.locator
 			detail: false
 
 			PyLoadEntry {
 				base: app.dataPath
-				locator: [provider, entryItem.id]
+				locator: followMeItem.locator
 				autostart: true
 
 				onFinished: {
 					if (success && entry != undefined) {
+						console.log('success in loading the item: ' + entry.id + ' from (old-id): ' + entryItem.id);
 						entryItem = entry;
 					}
 				}
@@ -75,13 +77,15 @@ Page {
 			PySaveEntry {
 				id: "saveEntry"
 				base: app.dataPath
-				locator: [provider, entryItem.id]
+				locator: followMeItem.locator
 			}
 
 			onClicked: {
 				starred = !starred;
 				entryItem.want = starred;
-				entryItem.label = primaryText;
+				console.log('toggle (+save) entryItem: ');
+				console.log(entryItem);
+				console.log(entryItem.locator);
 				saveEntry.save(entryItem);
 				app.dirtyList = true;
 			}
@@ -111,5 +115,4 @@ Page {
 		}
 	}
 }
-
 

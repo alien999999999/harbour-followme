@@ -14,6 +14,9 @@ ApplicationWindow
 	property bool dirtyList
 	property var ps: pageStack
 	property var plugins: ({})
+	property bool pluginsReady
+
+	signal pluginsCompleted ()
 
 	PyListEntries {
 		base: pluginPath
@@ -24,7 +27,12 @@ ApplicationWindow
 
 		signal pluginFound (var entry)
 
-		onPluginFound: plugins[entry.locator[0]] = entry;
+		onPluginFound: plugins[entry.locator[0].id] = entry;
+
+		onFinished: {
+			pluginsReady = true;
+			pluginsCompleted();
+		}
 	}
 
 	initialPage: Component {
