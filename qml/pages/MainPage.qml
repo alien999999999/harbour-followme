@@ -114,6 +114,7 @@ Page {
 							return ( a.id < b.id ? -1 : (a.id > b.id ? 1 : 0));
 						});
 						entryItem.total = entryItem.items.length;
+						followMeItem.total = entryItem.total;
 						console.log('chapters: ' + entryItem.total);
 						saveEntry.save(entryItem);
 						if (gotopage) {
