@@ -44,7 +44,10 @@ Page {
 		model: partItems
 
 		delegate: FollowMeImage {
+			id: "followMeImage"
+
 			property var part: partItems[index]
+
 			width: parent.width
 			parentLocator: entryPage.locator
 			partIndex: index
@@ -70,6 +73,7 @@ Page {
 					console.log('absoluteFile = ' + chapter.items[pageIndex]['absoluteFile']);
 					console.log('part.absoluteFile = ' + part['absoluteFile']);
 					console.log('reDownloadPage might need some reinitialize to redraw image');
+					followMeImage.imageSource = part['absoluteFile'];
 				}
 			}
 

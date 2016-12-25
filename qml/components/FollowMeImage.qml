@@ -12,7 +12,9 @@ ListItem {
 
 	signal imageError (var parentLocator, int partIndex, string partId)
 
+	property alias imageSource: imageFile.source
 	property bool ready: imageFile.status === Image.Ready
+
 	width: parent.width
 	height: ready ? imageFile.sourceSize.height * width / imageFile.sourceSize.width : busyFile.height + Theme.paddingLarge * 2
 
