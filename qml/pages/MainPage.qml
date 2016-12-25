@@ -74,7 +74,6 @@ Page {
 			id: 'followMeItem'
 
 			property var entryItem: entryModel[index]
-			property var ps: app.ps
 
 			signal markUnWanted (bool force)
 
@@ -242,7 +241,7 @@ Page {
 		console.log('last entry was: ' + entry.last);
 		console.log('go to entry with id: ' + entry.items[entry.last - 1].id);
 		// TODO: save the last entry in EntryPage
-		ps.push(Qt.resolvedUrl("EntryPage.qml"), {
+		pageStack.push(Qt.resolvedUrl("EntryPage.qml"), {
 			locator: entry.locator.concat([{id: entry.items[entry.last - 1].id, label: entry.items[entry.last - 1].label, file: entry.items[entry.last - 1].file}]),
 			current: entry.last,
 			prev: entry.last > 1 ? entry.last - 1 : -1,
