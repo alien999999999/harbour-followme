@@ -86,7 +86,7 @@ def saveData(base, locator, entry):
         r = False
     return r
 
-def downloadData(base, locator, suffix, remotefile):
+def downloadData(base, locator, suffix, remotefile, redownload):
     fileitem = locator.pop()
     folder = locateFolder(base, locator)
     try:
@@ -94,7 +94,7 @@ def downloadData(base, locator, suffix, remotefile):
     except FileExistsError:
         pass
     filename = folder + '/' + fileitem['id'].replace('/','-') + suffix
-    if os.path.isfile(filename):
+    if os.path.isfile(filename) and not redownload:
         return filename
     try:
         import urllib.request

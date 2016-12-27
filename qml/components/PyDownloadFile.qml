@@ -5,6 +5,8 @@ Python {
 	property string base
 	property var locator
 	property string url
+	property bool redownload
+
 	property bool autostart
 
 	signal finished (bool success, string filename)
@@ -44,7 +46,7 @@ Python {
 			}
 			console.log('suffix for file is: ' + suffix);
 			console.log("base filename to be stored is: '" + locator[locator.length - 1]['id'] + "'");
-			call('followme.downloadData', [base, locator, suffix, url], function (result) {
+			call('followme.downloadData', [base, locator, suffix, url, redownload], function (result) {
 				finished(result != false, result);
 			});
 		});
