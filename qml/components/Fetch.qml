@@ -1,6 +1,8 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
+import "../scripts/download.js" as Utils
+
 Ajax {
 	property var locator: []
 	property var plugin: locator != undefined && locator.length > 0 ? plugins[locator[0].id] : undefined
@@ -11,37 +13,7 @@ Ajax {
 	signal received (var entry)
 	signal done (bool success, var entries)
 
-	function getURL(plugin, locator) {
-		console.log('Fetch: getURL(): locator length ' + locator.length);
-		var url = '';
-		var i = locator.length - 1;
-		while (i > 0) {
-			var u = (locator[i].file != undefined ? locator[i].file : locator[i].id);
-			console.log('Fetch: basic url: "' + u + '"');
-			u = encodeURIComponent(u).replace(/%2F/g, '/');
-			console.log('Fetch: encoded url: "' + u + '"');
-			i--;
-			url = plugin.levels[i].filePrefix + u + plugin.levels[i].fileSuffix + url;
-			console.log('Fetch: url: "' + url + '" (' + i + ')');
-			console.log('Fetch: cumulative = ' + plugin.levels[i].fileCumulative);
-			if (!plugin.levels[i].fileCumulative) {
-				break;
-			}
-		}
-		console.log('Fetch: prefixBase = ' + plugin.levels[i].filePrefixBase);
-		// prefixBase is only for the base part of the url (ie: where the cumulativeness stops
-		if (plugin.levels[i].filePrefixBase) {
-			url = plugin.url + url;
-		}
-		// path suffix is specific for the current level
-		if (locator.length <= plugin.levels.length && plugin.levels[locator.length - 1].pathSuffix != undefined) {
-			console.log('Fetch: pathSuffix = ' + plugin.levels[locator.length - 1].pathSuffix);
-			url = url + plugin.levels[locator.length - 1].pathSuffix;
-		}
-		return url;
-	}
-
-	onStarted: url = getURL(plugin, locator);
+	onStarted: url = Utils.getURL(plugin, locator);
 
 	onFinished: {
 		if (status != 200) {
@@ -89,7 +61,7 @@ Ajax {
 			var file = results[level.filterFile];
 			var entry = {id: id, label: label, file: file}
 			var l = locator.concat([entry]);
-			var remoteFile = getURL(plugin, l);
+			var remoteFile = Utils.getURL(plugin, l);
 			entry['locator'] = l;
 			if (remoteFile.match(/^[a-z0-9]+:\/\/./)) {
 				entry['remoteFile'] = remoteFile;
