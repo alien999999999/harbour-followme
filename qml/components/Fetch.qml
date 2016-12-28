@@ -44,6 +44,11 @@ Ajax {
 	onStarted: url = getURL(plugin, locator);
 
 	onFinished: {
+		if (status != 200) {
+			console.log('xhr status: ' + status);
+			done(false,[]);
+			return ;
+		}
 		console.log('fetching "' + url + '" got me something...');
 		// TODO: preFilter + filter + call received
 		if (level.filter == '') {

@@ -1,25 +1,20 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
+import "../scripts/download.js" as Utils
+
 Item {
 	property string url
 	property bool autostart
 
-	property var xhr: new XMLHttpRequest
-
 	signal started ()
-	signal finished (string data)
+	signal finished (var status, string data)
 
 	function activate() {
 		started();
-		console.log("Ajax.activate(): getting url '" + url + "'...");
-		xhr.open("GET", url);
-		xhr.onreadystatechange = function() {
-			if (xhr.readyState == XMLHttpRequest.DONE) {
-				finished(xhr.responseText);
-			}
-		}
-		xhr.send();
+		Utils.ajax(url, function (status, data) {
+			finished(status, data);
+		});
 	}
 
 	Component.onCompleted: {
