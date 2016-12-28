@@ -81,9 +81,7 @@ Page {
 			secondaryText: entryItem.locator[0].label
 			starred: ( entryItem.last < entryItem.total )
 			last: entryItem.last
-			total: entryItem.total
-			locator: entryItem.locator
-			entryItems: entryItem.items
+			total: entryItem.items == undefined ? -1 : entryItem.items.length
 
 			onClicked: {
 				if (entryItem.items.length == 0) {

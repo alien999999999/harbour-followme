@@ -2,14 +2,11 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 ListItem {
-	id: "followMeItem"
-	property var locator
 	property string primaryText
 	property string secondaryText
 	property int last
 	property int total
 	property bool starred
-	property var entryItems: []
 	property bool detail: true
 
 	width: parent.width
