@@ -261,9 +261,6 @@ Page {
 	}
 
 	onStatusChanged: {
-		console.log('status changed: ' + status);
-		console.log('list dirty: ' + app.dirtyList);
-		console.log('plugins ready: ' + app.pluginsReady);
 		if (status == 1 && app.dirtyList && app.pluginsReady) {
 			console.log("status changed and main list is dirty and plugins were ready");
 			refreshList();
