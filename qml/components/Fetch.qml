@@ -2,9 +2,9 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 Ajax {
-	property var locator
-	property var plugin: plugins[locator[0].id]
-	property var level: plugin != undefined ? plugin.levels[locator.length - 1] : undefined
+	property var locator: []
+	property var plugin: locator != undefined && locator.length > 0 ? plugins[locator[0].id] : undefined
+	property var level: locator != undefined && plugin != undefined ? plugin.levels[locator.length - 1] : undefined
 	property bool fetchautostart
 	autostart: false
 
