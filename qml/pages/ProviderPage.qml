@@ -58,12 +58,11 @@ Page {
 			property var entryItem: entryModel[index]
 			primaryText: entryItem.label != undefined ? entryItem.label : entryItem.id
 			starred: (entryItem.want != undefined && entryItem.want)
-			locator: entryItem.locator
 			detail: false
 
 			PyLoadEntry {
 				base: app.dataPath
-				locator: followMeItem.locator
+				locator: entryItem.locator
 				autostart: true
 
 				onFinished: {
@@ -77,7 +76,7 @@ Page {
 			PySaveEntry {
 				id: "saveEntry"
 				base: app.dataPath
-				locator: followMeItem.locator
+				locator: entryItem.locator
 			}
 
 			onClicked: {
