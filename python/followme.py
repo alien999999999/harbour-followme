@@ -98,7 +98,10 @@ def downloadData(base, locator, suffix, remotefile, redownload):
         return filename
     try:
         import urllib.request
-        img = urllib.request.urlopen(remotefile)
+        req = urllib.request.Request(remotefile)
+        req.add_header('Accept', '*/*')
+        req.add_header('User-Agent', 'FollowMe/1.0')
+        img = urllib.request.urlopen(req)
         f = open(filename, 'bw')
         f.write(img.read())
         f.close()
