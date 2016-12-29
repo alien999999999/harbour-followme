@@ -1,0 +1,56 @@
+{
+	'label': "MangaReader",
+	'url': "http://www.mangareader.net",
+	'levels': [
+		{
+			'label': "Manga",
+			'pathSuffix': "/alphabetical",
+			'preFilter': '<ul class="series_alpha">',
+			'filter': '[^]?<li><a href="/([^"]+)"> ?([^<]+?)</a>(<span class="mangacompleted">[^<]+?</span>)?</li>([^]?</ul>[^]*?<ul class="series_alpha">)?',
+			'filterName': 2,
+			'filterFile': 1,
+			'filePrefix': "/",
+			'fileSuffix': "",
+			'fileCumulative': True,
+			'filePrefixBase': True,
+			'type': "list"
+		},
+		{
+			'label': "Manga",
+			'preFilter': '<div id="chapterlist">[^]+?</tr>',
+			'filter': '[^]?<tr>[^]+?<a href="/[^"]+/([^/"]+?)">(.+?)</a>[^]+?</tr>',
+			'filterName': 1,
+			'filterFile': 1,
+			'filePrefix': "/",
+			'fileSuffix': "",
+			'fileCumulative': True,
+			'filePrefixBase': False,
+			'type': "list"
+		},
+		{
+			'label': "Chapter",
+			'preFilter': '<select id="pageMenu" name="pageMenu">',
+			'filter': '[^]?<option value="([^"]+)"[^>]*>(.+?)</option>',
+			'filterName': 2,
+			'filterFile': 1,
+			'filterId': 1,
+			'filePrefix': "",
+			'fileSuffix': "",
+			'fileCumulative': False,
+			'filePrefixBase': True,
+			'type': "entry"
+		},
+		{
+			'label': "Page",
+			'preFilter': '',
+			'filter': '<div id="imgholder"><a href="[^"]+"><img[^>]* src="([^"]+)"',
+			'filterName': 1,
+			'filterFile': 1,
+			'filePrefix': "",
+			'fileSuffix': "",
+			'fileCumulative': False,
+			'filePrefixBase': False,
+			'type': "part"
+		}
+	]
+}
