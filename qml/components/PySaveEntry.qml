@@ -2,7 +2,6 @@ import io.thp.pyotherside 1.3
 
 Python {
 	property string base
-	property var locator
 	property var entry
 
 	signal finished (bool success, var entry)
@@ -10,7 +9,10 @@ Python {
 	function activate() {
 		addImportPath(Qt.resolvedUrl('../../python'));
 		importModule('followme', function () {
-			call('followme.saveData', [base, locator, entry], function (result) {
+			if (entry.locator == undefined) {
+				console.error('entry needs a locator');
+			}
+			call('followme.saveData', [base, entry], function (result) {
 				finished(result != null, result);
 			});
 		});
