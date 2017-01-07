@@ -15,14 +15,14 @@ ListItem {
 	property alias imageSource: imageFile.source
 	property bool ready: imageFile.status === Image.Ready
 
-	width: parent.width
-	height: ready ? imageFile.sourceSize.height * width / imageFile.sourceSize.width : busyFile.height + Theme.paddingLarge * 2
+	height: ready ? imageFile.sourceSize.height * imageFile.width / imageFile.sourceSize.width : busyFile.height + Theme.paddingLarge * 2
 
 	Image {
 		id: "imageFile"
 		source: absoluteFile
 		fillMode: Image.PreserveAspectFit
-		width: parent.width
+		width: parent.width - Theme.paddingSmall
+		anchors.rightMargin: Theme.paddingSmall
 		height: ready ? imageFile.sourceSize.height * width / imageFile.sourceSize.width : 0
 		Component.onCompleted: {
 			if (imageFile.status === Image.Error || absoluteFile == '') {
