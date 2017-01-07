@@ -43,7 +43,7 @@
 		{
 			'label': "Page",
 			'preFilter': '',
-			'filter': '<div id="imgholder"><a href="[^"]+"><img[^>]* src="([^"]+)"',
+			'filter': '<div id="imgholder">(?:<div id="zoomer"[^>]*>[^<]*</div>)?[^]?<a href="[^"]+"><img[^>]* src="([^"]+)"',
 			'filterName': 1,
 			'filterFile': 1,
 			'filePrefix': "",
