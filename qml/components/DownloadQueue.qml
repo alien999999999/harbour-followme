@@ -76,11 +76,46 @@ Item {
 
 	function currentLabel() {
 		var item = getItem();
-		return (item == undefined || item['originator'] == undefined || item['originator'].length == 0 || item['originator'][item['originator'].length - 1].label == undefined ? '' : item['originator'][item['originator'].length - 1].label);
+		if (item == undefined) {
+			return '';
+		}
+		var p1 = item['originator'][item['originator'].length - 1];
+		p1 = p1.label != undefined ? p1.label : p1.id;
+		var p2 = item['locator'].length > item['originator'].length ? item['locator'][item['originator'].length] : undefined;
+		p2 = p2 == undefined ? '' : ' (' + (p2.label != undefined ? p2.label : p2.id) + ')';
+		// TODO: add a label type for originator before the rest of the text (ie: Chapter)
+		return p1 + p2;
 	}
 
 	function currentValue() {
-		return (position >= 0 && queue.length > 0 ? position / queue.length : 0);
+		if (queue.length == 0) {
+			return 1;
+		}
+		// loop and find all different originators
+		// add them to a dict to be able to calc the progress value
+		var progress = {}
+		for (var i in queue) {
+			var orig = []
+			for (var j in queue[i].originator) {
+				orig.push(queue[i].originator[j].id);
+			}
+			orig = orig.join(',');
+			if (progress[orig] == undefined) {
+				progress[orig] = {total: 0, finished: 0};
+			}
+			progress[orig].total++;
+			if (queue[i].finished) {
+				progress[orig].finished++;
+			}
+		}
+		var v = 0;
+		var t = 0;
+		// loop the dict and calc the progress value
+		for (var i in progress) {
+			v += (progress[i].finished / progress[i].total);
+			t++;
+		}
+		return (v / t);
 	}
 
 	/** doCleanup
