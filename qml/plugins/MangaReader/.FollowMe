@@ -33,7 +33,7 @@
 			'filter': '[^]?<option value="([^"]+)"[^>]*>(.+?)</option>',
 			'filterName': 2,
 			'filterFile': 1,
-			'filterId': 1,
+			'filterId': 2,
 			'filePrefix': "",
 			'fileSuffix': "",
 			'fileCumulative': False,
