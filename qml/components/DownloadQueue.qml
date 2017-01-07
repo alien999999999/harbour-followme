@@ -240,6 +240,7 @@ Item {
 							for (var i in entries) {
 								var req = {
 									locator: item.locator.concat([{id: entries[i].id, file: entries[i].file, label: entries[i].label}]),
+									originator: item.originator,
 									depth: item['depth'] == 0 ? 0 : item['depth'] - 1
 								};
 								console.log('add child request: locator length: ' + req.locator.length);
