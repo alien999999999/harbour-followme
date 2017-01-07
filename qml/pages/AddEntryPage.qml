@@ -23,10 +23,6 @@ Page {
 			}
 		}
 
-		footer: QueueProgress {
-			downloadQueue: app.downloadQueue
-		}
-
 		model: pluginModel
 
 		delegate: ListItem {
