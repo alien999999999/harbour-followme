@@ -50,3 +50,31 @@ function getURL(plugin, locator) {
 	}
 	return url;
 }
+
+/** getSuffix(file)
+ * gets the suffix from a file
+ */
+function getSuffix(file) {
+	var l = file.split('/');
+	var suffix = '';
+	var r = l[l.length - 1].match(/\.[a-z0-9]{3,4}$/);
+	if (r != null) {
+		suffix = r[0];
+	}
+	return suffix;
+}
+
+/** getAbsoluteFile(remoteFile)
+ * try to determine the absoluteFile 's name when downloaded
+ */
+function getAbsoluteFile(base, locator, remoteFile) {
+	var l = locator.slice();
+	var item = l.pop();
+	var suffix = getSuffix(remoteFile);
+	var file = item['id'].replace('/','-') + suffix;
+	var folder = base.replace('~', '/home/nemo');
+	for (var i in l) {
+		folder += '/' + l[i]['id'].replace('/','-');
+	}
+	return folder + '/' + file;
+}
