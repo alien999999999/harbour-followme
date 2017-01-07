@@ -4,8 +4,8 @@ import Sailfish.Silica 1.0
 ListItem {
 	property string primaryText
 	property string secondaryText
-	property int last
-	property int total
+	property string last
+	property string total
 	property bool starred
 	property bool detail: true
 
@@ -52,7 +52,7 @@ ListItem {
 
 	Label {
 		visible: detail
-		text: ( last > 0 ? last : '??') + '/' + ( total >= 0 ? total : '??' )
+		text: last + '/' + total
 		color: Theme.secondaryColor
 		font.pixelSize: Theme.fontSizeSmall
 		anchors {
