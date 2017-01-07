@@ -25,7 +25,7 @@ Item {
 
 	onQChanged: {
 		// TODO: make some better approximation of progress
-		//progressBar.value = downloadQueue.position / downloadQueue.queueLength;
+		progressBar.value = downloadQueue.currentValue()
 		console.log('Queue was changed(' + downloadQueue.queue.length + '), running: ' + downloadQueue.running);
 	}
 
