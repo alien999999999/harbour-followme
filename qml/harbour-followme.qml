@@ -16,7 +16,38 @@ ApplicationWindow
 	property var plugins: ({})
 	property bool pluginsReady
 
+	property alias downloadQueue: dQueue
+
 	signal pluginsCompleted ()
+
+	function getPlugin(locator) {
+		if (locator == undefined || locator.length == 0) {
+			return undefined;
+		}
+		console.log('there are ' + plugins.length + ' plugins: ');
+		for (var i in plugins) { console.log(' - ' + i); }
+		console.log('looking for plugin ' + locator[0].id);
+		return plugins[locator[0].id];
+	}
+
+	function getLevel(locator) {
+		var plugin = getPlugin(locator);
+		console.log('plugin ' + plugin.label + ' levels ' + plugin.levels.length);
+		if (plugin == undefined || locator.length > plugin.levels.length) {
+			return undefined;
+		}
+		return plugin.levels[locator.length - 1];
+	}
+
+	function isLevelType(locator, type) {
+		var level = getLevel(locator);
+		console.log('locator with length ' + locator.length + '; has level type: ' + level.type);
+		return (level != undefined && level.type == type);
+	}
+
+	function isDownload(locator) {
+		return isLevelType(locator, "image");
+	}
 
 	PyListEntries {
 		base: pluginPath
@@ -33,6 +64,10 @@ ApplicationWindow
 			pluginsReady = true;
 			pluginsCompleted();
 		}
+	}
+
+	DownloadQueue {
+		id: "dQueue"
 	}
 
 	initialPage: Component {

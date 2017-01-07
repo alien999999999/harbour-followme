@@ -59,19 +59,26 @@ Ajax {
 			var label = results[level.filterName];
 			var id = results[level.filterId];
 			var file = results[level.filterFile];
-			var entry = {id: id, label: label, file: file}
+			var entry = {id: id, label: label, file: file};
 			var l = locator.concat([entry]);
 			var remoteFile = Utils.getURL(plugin, l);
-			entry['locator'] = l;
-			if (remoteFile.match(/^[a-z0-9]+:\/\/./)) {
-				entry['remoteFile'] = remoteFile;
-			}
-			else {
-				if (file.match(/^[a-z0-9]+:\/\/./)) {
-					entry['remoteFile'] = file;
+			console.log('url of found entry is: ' + remoteFile);
+			//entry['locator'] = l;
+			console.log('it has level type: ' + app.getLevel(l).type);
+			if (app.isDownload(l)) {
+				if (remoteFile.match(/^[a-z0-9]+:\/\/./)) {
+					entry['remoteFile'] = remoteFile;
+				}
+				else {
+					if (file.match(/^[a-z0-9]+:\/\/./)) {
+						entry['remoteFile'] = file;
+					}
 				}
 			}
-			console.log('found id "' + id + '", file:"' + file + '", remoteFile: "' + entry['remoteFile'] + '"');
+			if (entry['remoteFile'] != undefined) {
+				entry['absoluteFile'] = Utils.getAbsoluteFile(app.dataPath, locator, entry['remoteFile']);
+			}
+			console.log('found id "' + id + '", file:"' + file + '", remoteFile: "' + remoteFile + '"');
 			received(entry);
 			res.push(entry);
 			lastIndex = re.lastIndex;

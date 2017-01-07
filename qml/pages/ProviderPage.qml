@@ -11,11 +11,18 @@ Page {
 	property int level: locator.length
 	property var entryModel: []
 
+	signal activate()
+	signal done(bool success, var entries)
+
 	SilicaListView {
 		id: "favList"
 		property bool loading: true
 
-		anchors.fill: parent
+		anchors {
+			top: parent.top
+			bottom: queueProgress.top
+		}
+		width: parent.width
 
 		header: Column {
 			width: parent.width
@@ -45,7 +52,7 @@ Page {
 					favList.model = [];
 					entryModel = [];
 					favList.model = entryModel;
-					fetchEntries.activate();
+					providerPage.activate();
 				}
 			}
 		}
@@ -62,7 +69,7 @@ Page {
 
 			PyLoadEntry {
 				base: app.dataPath
-				locator: entryItem.locator
+				locator: providerPage.locator.concat([{id:entryItem.id, label: entryItem.label}]);
 				autostart: true
 
 				onFinished: {
@@ -76,7 +83,6 @@ Page {
 			PySaveEntry {
 				id: "saveEntry"
 				base: app.dataPath
-				locator: entryItem.locator
 			}
 
 			onClicked: {
@@ -84,34 +90,48 @@ Page {
 				entryItem.want = starred;
 				console.log('toggle (+save) entryItem: ');
 				console.log(entryItem);
-				console.log(entryItem.locator);
+				entryItem.locator = providerPage.locator.concat([{id:entryItem.id, label: entryItem.label}]);
 				saveEntry.save(entryItem);
 				app.dirtyList = true;
 			}
 		}
 
 	        VerticalScrollDecorator {}
-
-		Fetch {
-			id: "fetchEntries"
-			locator: providerPage.locator
-			fetchautostart: true
-
-			onStarted: entryModel = [];
-			
-			onReceived: {
-				console.log('found entry ' + entry.id);
-			}
-
-			onDone: {
-				if (success) {
-					console.log('found ' + entries.length + ' entries');
-					entryModel = entries;
-					favList.model = entryModel;
-				}
-				favList.loading = false;
-			}
-		}
 	}
+
+	QueueProgress {
+		id: "queueProgress"
+
+		downloadQueue: app.downloadQueue
+
+		anchors {
+			bottom: parent.bottom
+			bottomMargin: Theme.paddingSmall
+			topMargin: Theme.paddingSmall
+		}
+		width: parent.width
+	}
+
+	onActivate: app.downloadQueue.immediate({
+		locator: providerPage.locator,
+		depth: 1,
+		sort: true,
+		done: providerPage.done,
+		doneHandler: function (success, item, entries, saveEntry){
+			item.done(success, entries);
+			return [];
+		}
+	}, function (){console.log('immediate request was filed; position: ' + app.downloadQueue.position);});
+
+	onDone: {
+		if (success) {
+			console.log('found ' + entries.length + ' entries');
+			entryModel = entries;
+			favList.model = entryModel;
+		}
+		favList.loading = false;
+	}
+
+	Component.onCompleted: activate();
 }
 

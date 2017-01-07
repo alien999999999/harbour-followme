@@ -31,7 +31,6 @@ Item {
 	PySaveEntry {
 		id: "saveChapter"
 		base: app.dataPath
-		locator: downloadChapter.locator
 	}
 
 	onDonePages: {

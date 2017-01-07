@@ -18,7 +18,11 @@ Page {
 		property bool loading
 		property bool firstTime
 
-		anchors.fill: parent
+		anchors {
+			top: parent.top
+			bottom: queueProgress.top
+		}
+		width: parent.width
 
 		header: Column {
 			width: parent.width
@@ -59,10 +63,13 @@ Page {
 			MenuItem {
 				text: qsTr("Check updates")
 				onClicked: {
-					for (var i in entryList.children) {
-						if (entryList.children[i].starred != undefined) {
-							entryList.children[i].fetchChapters.activate();
-						}
+					for (var i in entryModel) {
+						app.downloadQueue.append({
+							locator: entryModel[i].locator,
+							entry: entryModel[i],
+							depth: 1,
+							sort: true
+						});
 					}
 				}
 			}
@@ -79,9 +86,9 @@ Page {
 
 			primaryText: entryItem.label
 			secondaryText: entryItem.locator[0].label
-			starred: ( entryItem.last < entryItem.total )
 			last: entryItem.last
 			total: entryItem.items == undefined ? -1 : entryItem.items.length
+			starred: ( entryItem.last < total )
 
 			onClicked: {
 				if (entryItem.items.length == 0) {
@@ -108,7 +115,16 @@ Page {
 				onDone: {
 					if (success) {
 						entryItem.items.sort(function (a,b) {
-							return ( a.id < b.id ? -1 : (a.id > b.id ? 1 : 0));
+							if (a == undefined | b == undefined) {
+								return 0;
+							}
+							var sa = parseInt(a.id);
+							var sb = parseInt(b.id);
+							if (sa == NaN || sb == NaN || ('' + sa) != a.id || ('' + sb) != b.id) {
+								sa = a.id;
+								sb = b.id;
+							}
+							return ( sa < sb ? -1 : (sa > sb ? 1 : 0));
 						});
 						entryItem.total = entryItem.items.length;
 						followMeItem.total = entryItem.total;
@@ -124,7 +140,6 @@ Page {
 			PySaveEntry {
 				id: "saveEntry"
 				base: app.dataPath
-				locator: entryItem.locator
 			}
 
 			DownloadChapters {
@@ -146,15 +161,18 @@ Page {
 			menu: ContextMenu {
 				MenuItem {
 					visible: (entryItem.locator[0].id in app.plugins)
-					text: qsTr("Check updates")
+					text: qsTr("Check updates (old)")
 					onClicked: {
 						fetchChapters.activate();
 					}
 				}
 				MenuItem {
-					visible: (entryItem.locator[0].id in app.plugins) && (last > 0) && (total > 0)
-					text: qsTr("Download some chapters")
+					visible: (entryItem.locator[0].id in app.plugins) && (total > 0)
+					text: qsTr("Download some chapters (new)")
 					onClicked: {
+						if (last == undefined || last < 1) {
+							last = 1
+						}
 						var dialog = pageStack.push(Qt.resolvedUrl("SliderDialog.qml"), {
 							title: qsTr("Download until chapter"),
 							number: (last + 10 < total ? last + 10 : total),
@@ -164,9 +182,15 @@ Page {
 						});
 						dialog.accepted.connect(function (){
 							console.log("download chapters from " + last + " until " + dialog.number);
-							downloadChapters.from = last;
-							downloadChapters.to = dialog.number;
-							downloadChapters.activate();
+							for (var i = last - 1; i < dialog.number; i++) {
+								console.log("downloading #" + (i + 1));
+								for (var j in entryItem.items[i]) { console.log(" - " + j + ": " + entryItem.items[i][j]); }
+								app.downloadQueue.append({
+									locator: entryItem.locator.concat([{id: entryItem.items[i].id, file: entryItem.items[i].file, label: entryItem.items[i].label}]),
+									entry: entryItem.items[i],
+									sort: true
+								});
+							}
 						});
 					}
 				}
@@ -224,11 +248,24 @@ Page {
 				entryList.firstTime = (entries.length == 0);
 				// show update entries
 				entryModel.sort(function (a,b) {
-					return (a.last != undefined && a.last > 0 ? (a.last == a.total ? 1 : -1) : 0) - (b.last != undefined && b.last > 0 ? (b.last == b.total ? 1 : -1) : 0);
+					return (a.last != undefined && a.last > 0 ? (a.last == a.items.length ? 1 : -1) : 0) - (b.last != undefined && b.last > 0 ? (b.last == b.items.length ? 1 : -1) : 0);
 				});
 				entryList.model = entryModel;
 			}
 		}
+	}
+
+	QueueProgress {
+		id: "queueProgress"
+
+		downloadQueue: app.downloadQueue
+
+		anchors {
+			bottom: parent.bottom
+			bottomMargin: Theme.paddingSmall
+			topMargin: Theme.paddingSmall
+		}
+		width: parent.width
 	}
 
 	onGotoEntry: {

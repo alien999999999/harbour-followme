@@ -49,7 +49,7 @@ Item {
 				// only the first entry is the actual image file
 				console.log('fetchPage: remoteFile is: ' + entries[0].remoteFile);
 				chapter.items[pageIndex].remoteFile = entries[0].remoteFile;
-				chapter.items[pageIndex].absoluteFile = downloadFile.getAbsoluteFile(chapter.items[pageIndex].remoteFile);
+				chapter.items[pageIndex].absoluteFile = Utils.getAbsoluteFile(app.dataPath, downloadPage.locator, chapter.items[pageIndex].remoteFile);
 				if (!nodownload && !pageExists()) {
 					// if the page does not exist, download it and exit
 					downloadFile.url = chapter.items[pageIndex].remoteFile;
@@ -76,9 +76,13 @@ Item {
 			if (success) {
 				console.log('downloaded into: ' + filename);
 				// when successfully downloaded, set the absoluteFile and file to the new local file
-				chapter.items[pageIndex].absoluteFile = filename;
-				var f = filename.split('/');
-				chapter.items[pageIndex].file = f[f.length - 1];
+				chapter.items[pageIndex].file = filename;
+				var r = [app.dataPath];
+				for (var i in downloadPage.locator) {
+					r.push(downloadPage.locator[i].file)
+				}
+				r.push(filename);
+				chapter.items[pageIndex].absoluteFile = r.join('/');
 			}
 			downloadPage.done(success);
 		}

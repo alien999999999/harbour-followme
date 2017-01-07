@@ -11,7 +11,9 @@ Page {
 
 	SilicaListView {
 		id: "searchView"
+
 		anchors.fill: parent
+
 		header: Column {
 			width: parent.width
 			height: header.height + Theme.paddingLarge
@@ -20,6 +22,11 @@ Page {
 				title: "Content providers"
 			}
 		}
+
+		footer: QueueProgress {
+			downloadQueue: app.downloadQueue
+		}
+
 		model: pluginModel
 
 		delegate: ListItem {
