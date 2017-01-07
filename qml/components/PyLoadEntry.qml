@@ -12,7 +12,7 @@ Python {
 		addImportPath(Qt.resolvedUrl('../../python'));
 		importModule('followme', function () {
 			call('followme.loadData', [base, locator], function (result) {
-				finished(result != false, result);
+				finished(result != false && result.error == undefined, result);
 			});
 		});
 	}
