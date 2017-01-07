@@ -49,6 +49,14 @@
 			'fileCumulative': False,
 			'filePrefixBase': True,
 			'type': "part"
+		},
+		{
+			'label': "Image",
+			'filePrefix': "",
+			'fileSuffix': "",
+			'fileCumulative': False,
+			'filePrefixBase': False,
+			'type': "image"
 		}
 	]
 }
