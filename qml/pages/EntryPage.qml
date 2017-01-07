@@ -4,16 +4,14 @@ import "../components"
 
 Page {
 	id: "entryPage"
-	property string name
-	property var locator
-	property string label: locator[locator.length - 1].label
-	property int prev
-	property int current
-	property int next
-	property var siblings
 	property var parentEntry
-	property var chapter: ({id: siblings[current - 1].id, label: siblings[current - 1].label, items: []})
-	property var partItems: chapter.items
+	property int current
+
+	property var chapter
+
+	property int prev: current < 0 ? -1 : current - 1
+	property int next: (current + 1) < parentEntry.items.length ? current + 1 : -1
+	property var partModel: chapter != undefined && chapter.items != undefined ? chapter.items : []
 
 	signal gotoSibling (int number)
 	signal markRead (bool force)
@@ -31,7 +29,7 @@ Page {
 			height: header.height + Theme.paddingLarge
 			PageHeader {
 				id: "header"
-				title: name + ": " + "Chapter" + " " + label
+				title: parentEntry.label + ": " + "Chapter" + " " + (chapter != undefined && chapter.label != undefined ? chapter.label : ( parentEntry.items[current].label != undefined ? parentEntry.items[current].label : parentEntry.items[current].id ) )
 			}
 
 			BusyIndicator {
@@ -41,15 +39,15 @@ Page {
 			}
 		}
 
-		model: partItems
+		model: partModel
 
 		delegate: FollowMeImage {
 			id: "followMeImage"
 
-			property var part: partItems[index]
+			property var part: partModel[index]
 
 			width: parent.width
-			parentLocator: entryPage.locator
+			parentLocator: chapter.locator
 			partIndex: index
 			partId: part.id
 			file: part.file
@@ -81,8 +79,6 @@ Page {
 				console.log("image has error, redownloading it...");
 				app.downloadQueue.immediate({
 					locator: parentLocator.concat([{id: part.id, file: part.file, label: part.label}]),
-					//chapter: entryPage.chapter,
-					//pageIndex: partIndex,
 					remoteFile: entryPage.chapter.items[partIndex]['remoteFile'],
 					doneHandler: function (success, item, filename, saveEntry){
 						if (!success) {
@@ -110,8 +106,6 @@ Page {
 					onClicked: {
 						app.downloadQueue.immediate({
 							locator: parentLocator.concat([{id: part.id, file: part.file, label: part.label}]),
-							//chapter: entryPage.chapter,
-							//pageIndex: partIndex,
 							remoteFile: entryPage.chapter.items[partIndex]['remoteFile'],
 							redownload: true,
 							doneHandler: function (success, item, filename, saveEntry){
@@ -140,20 +134,20 @@ Page {
 	        VerticalScrollDecorator {}
 
 		PullDownMenu {
-			visible: prev > 0 || next > 0
+			visible: prev >= 0 || next > 0
 			MenuItem {
-				visible: siblings.length > 1
+				visible: parentEntry.items.length > 1
 				text: qsTr("Jump To")
 				onClicked: {
 					var dialog = pageStack.push(Qt.resolvedUrl("SliderDialog.qml"), {
 						title: qsTr("Jump to chapter"),
-						number: entryPage.current,
+						number: entryPage.current + 1,
 						unit: qsTr("chapter"),
 						minimum: 1,
-						maximum: entryPage.siblings.length
+						maximum: entryPage.parentEntry.items.length
 					});
 					dialog.accepted.connect(function (){
-						gotoSibling(dialog.number);
+						gotoSibling(dialog.number - 1);
 					});
 				}
 			}
@@ -163,7 +157,7 @@ Page {
 				onClicked: gotoSibling(next);
 			}
 			MenuItem {
-				visible: prev > 0
+				visible: prev >= 0
 				text: qsTr("Previous")
 				onClicked: gotoSibling(prev);
 			}
@@ -184,7 +178,7 @@ Page {
 		entry: entryPage.chapter
 
 		onFinished: {
-			console.log('saving chapter [' + locator.length + ']: ' + (success ? "ok" : "nok"));
+			console.log('saving chapter: ' + (success ? "ok" : "nok"));
 			app.dirtyList = true;
 		}
 	}
@@ -195,41 +189,26 @@ Page {
 		entry: entryPage.parentEntry
 
 		onFinished: {
-			console.log('saving entry [' + locator.length + ']: ' + (success ? "ok" : "nok"));
+			console.log('saving entry: ' + (success ? "ok" : "nok"));
 			app.dirtyList = true;
-		}
-	}
-
-	DownloadChapter {
-		id: "downloadChapter"
-		locator: entryPage.locator
-		chapter: entryPage.chapter
-		nodownload: true
-
-		onDone: {
-			// force saving while marking as read
-			markRead(true);
-			console.log("chapter items: " + chapter.items.length);
-			console.log("saving to chapter: " + entryPage.current);
-			markLast();
-			partItems = chapter.items;
-			entryView.model = partItems;
 		}
 	}
 
 	PyLoadEntry {
 		id: "loadChapter"
 		base: app.dataPath
-		locator: entryPage.locator
+		locator: parentEntry.locator.concat([{id: parentEntry.items[current].id, file: parentEntry.items[current].file, label: parentEntry.items[current].label}])
 		autostart: true
 
 		onFinished: {
 			if (success) {
+				// fix label before saving parent
+				if (entry.label != undefined) {
+					parentEntry.items[current].label = entry.label;
+				}
 				markLast();
 				chapter = entry;
-				label = entry.label;
-				partItems = entry.items;
-				entryView.model = partItems;
+				entryView.model = partModel;
 				console.log("saving to chapter: " + entryPage.current);
 				// mark it as read
 				markRead(false);
@@ -237,7 +216,17 @@ Page {
 			}
 			// fetch them online (not from dir)
 			console.log('downloading chapter');
-			downloadChapter.activate();
+			//downloadChapter.activate();
+			// make a chapter start
+			if (chapter == undefined) {
+				chapter = ({id: parentEntry.items[current].id, file: parentEntry.items[current].file, label: parentEntry.items[current].label, items: [], last: -1, read: false});
+			}
+			app.downloadQueue.immediate({
+				locator: loadChapter.locator,
+				depth: 1,
+				sort: true,
+				entry: chapter
+			});
 		}
 	}
 
@@ -253,23 +242,19 @@ Page {
 
 	onMarkLast: {
 		// no need to save parentEntry if this was the last one
-		if (parentEntry.last != undefined && parentEntry.last == current) {
+		if (parentEntry.last != undefined && parentEntry.last == parentEntry.items[current].id) {
 			return ;
 		}
 		// save last entry
-		parentEntry.last = current;
+		parentEntry.last = parentEntry.items[current].id;
 		saveEntry.activate();
 	}
 
 	onGotoSibling: {
-		console.log('gotoSibling(' + number + '): ' + entryPage.siblings[number - 1].id);
+		console.log('gotoSibling(' + number + '): ' + entryPage.parentEntry.items[number].id);
 		entryView.model = [];
-		entryPage.locator.splice(entryPage.locator.length - 1, 1, {id: entryPage.siblings[number - 1].id, label: entryPage.siblings[number - 1].label, file: entryPage.siblings[number - 1].file});
 		entryPage.current = number;
-		entryPage.prev = number - 1 > 0 ? number - 1 : -1;
-		entryPage.next = number + 1 < entryPage.siblings.length ? number + 1 : -1;
-		entryView.model = partItems;
+		entryView.model = partModel;
 		loadChapter.activate();
-		// i wonder if some kind of refresh is needed...
 	}
 }

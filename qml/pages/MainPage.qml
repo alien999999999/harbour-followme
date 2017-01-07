@@ -86,9 +86,9 @@ Page {
 
 			primaryText: entryItem.label
 			secondaryText: entryItem.locator[0].label
-			last: entryItem.last
-			total: entryItem.items == undefined ? -1 : entryItem.items.length
-			starred: ( entryItem.last < total )
+			last: entryItem.last == undefined || entryItem.last == -1 ? '??' : entryItem.last
+			total: entryItem.items == undefined || entryItem.items.length == 0 ? '??' : ( entryItem.items[entryItem.items.length - 1].label != undefined ? entryItem.items[entryItem.items.length - 1].label : entryItem.items[entryItem.items.length - 1].id)
+			starred: ( entryItem.last != total )
 
 			onClicked: {
 				if (entryItem.items.length == 0) {
@@ -126,9 +126,8 @@ Page {
 							}
 							return ( sa < sb ? -1 : (sa > sb ? 1 : 0));
 						});
-						entryItem.total = entryItem.items.length;
-						followMeItem.total = entryItem.total;
-						console.log('chapters: ' + entryItem.total);
+						//followMeItem.total = entryItem.items.length;
+						console.log('chapters: ' + followMeItem.total);
 						saveEntry.save(entryItem);
 						if (gotopage) {
 							gotoEntry(entryItem);
@@ -161,28 +160,39 @@ Page {
 			menu: ContextMenu {
 				MenuItem {
 					visible: (entryItem.locator[0].id in app.plugins)
-					text: qsTr("Check updates (old)")
+					text: qsTr("Check updates")
 					onClicked: {
-						fetchChapters.activate();
+						app.downloadQueue.append({
+							locator: entryModel[index].locator,
+							entry: entryModel[index],
+							depth: 1,
+							sort: true
+						});
 					}
 				}
 				MenuItem {
-					visible: (entryItem.locator[0].id in app.plugins) && (total > 0)
-					text: qsTr("Download some chapters (new)")
+					visible: (entryItem.locator[0].id in app.plugins) && (entryItem.items.length > 0)
+					text: qsTr("Download some chapters")
 					onClicked: {
-						if (last == undefined || last < 1) {
-							last = 1
+						var t = entryItem.items.length;
+						var l = 0;
+						for (var i in entryItem.items) {
+							if (last == entryItem.items[i].id) {
+								l = i;
+							}
 						}
+						// start 1-based (because it's visible)
+						l++;
 						var dialog = pageStack.push(Qt.resolvedUrl("SliderDialog.qml"), {
 							title: qsTr("Download until chapter"),
-							number: (last + 10 < total ? last + 10 : total),
+							number: (l + 10 < t ? l + 10 : t),
 							unit: qsTr("chapter"),
-							minimum: last,
-							maximum: total
+							minimum: l,
+							maximum: t
 						});
 						dialog.accepted.connect(function (){
-							console.log("download chapters from " + last + " until " + dialog.number);
-							for (var i = last - 1; i < dialog.number; i++) {
+							console.log("download chapters from " + l + " until " + dialog.number);
+							for (var i = l - 1; i < dialog.number; i++) {
 								console.log("downloading #" + (i + 1));
 								for (var j in entryItem.items[i]) { console.log(" - " + j + ": " + entryItem.items[i][j]); }
 								app.downloadQueue.append({
@@ -227,9 +237,6 @@ Page {
 				if (entry.last == undefined) {
 					entry.last = -1;
 				}
-				if (entry.total == undefined) {
-					entry.total = -1;
-				}
 				if (entry.items == undefined) {
 					entry.items = [];
 				}
@@ -248,7 +255,7 @@ Page {
 				entryList.firstTime = (entries.length == 0);
 				// show update entries
 				entryModel.sort(function (a,b) {
-					return (a.last != undefined && a.last > 0 ? (a.last == a.items.length ? 1 : -1) : 0) - (b.last != undefined && b.last > 0 ? (b.last == b.items.length ? 1 : -1) : 0);
+					return (a.last != undefined && a.last > 0 ? (a.last == a.items[a.items.length - 1].id ? 1 : -1) : 0) - (b.last != undefined && b.last > 0 ? (b.last == b.items[b.items.length - 1].id ? 1 : -1) : 0);
 				});
 				entryList.model = entryModel;
 			}
@@ -268,22 +275,21 @@ Page {
 		width: parent.width
 	}
 
+	// MUST: entry.items.length > 0
 	onGotoEntry: {
-		if (entry.last < 1) {
-			// select the first one if not read before (or unsaved)
-			entry.last = 1;
+		var entryIndex = 0;
+		if (entry.last != undefined) {
+			for (var i in entry.items) {
+				if (entry.items[i].id == entry.last) {
+					entryIndex = i;
+				}
+			}
 		}
 		console.log('last entry was: ' + entry.last);
-		console.log('go to entry with id: ' + entry.items[entry.last - 1].id);
-		// TODO: save the last entry in EntryPage
+		console.log('go to entry with id: ' + entry.items[entryIndex].id);
 		pageStack.push(Qt.resolvedUrl("EntryPage.qml"), {
-			locator: entry.locator.concat([{id: entry.items[entry.last - 1].id, label: entry.items[entry.last - 1].label, file: entry.items[entry.last - 1].file}]),
-			current: entry.last,
-			prev: entry.last > 1 ? entry.last - 1 : -1,
-			next: entry.last < entry.total ? entry.last + 1 : -1,
-			name: entry.label,
-			siblings: entry.items,
-			parentEntry: entry
+			parentEntry: entry,
+			current: entryIndex
 		});
 	}
 
