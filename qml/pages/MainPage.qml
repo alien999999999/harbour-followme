@@ -141,19 +141,15 @@ Page {
 				base: app.dataPath
 			}
 
-			DownloadChapters {
-				id: "downloadChapters"
-				locator: entryItem.locator
-				chapters: entryItem.items
-
-				onDone: console.log("chapters are downloaded: " + (success ? "ok" : "nok"));
-			}
-
 			onMarkUnWanted: {
-				if (!entryItem.want) {
-					entryItem.want = false;
-					saveEntry.activate();
+				console.log("wanted: " + entryItem.want);
+				if (entryItem.want) {
+					followMeItem.primaryText = '';
+					followMeItem.secondaryText = '';
+					followMeItem.detail = false;
 					followMeItem.height = 0;
+					entryItem.want = false;
+					saveEntry.save(entryItem);
 				}
 			}
 

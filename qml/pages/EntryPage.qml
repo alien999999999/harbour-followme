@@ -53,28 +53,6 @@ Page {
 			file: part.file
 			absoluteFile: part.absoluteFile != undefined ? part.absoluteFile : ''
 
-			DownloadPage {
-				id: "reDownloadPage"
-				locator: parentLocator.concat([{id: part.id, file: part.file, label: part.label}])
-				chapter: entryPage.chapter
-				pageIndex: partIndex
-				pageList: [] //TODO: need to get the page list from disk!
-
-				onDone: {
-					if (part.absoluteFile != undefined) {
-						absoluteFile = part.absoluteFile;
-						// TODO: avoid this, by prechecking the absoluteFile and saving the chapter with it.
-						saveChapter.activate();
-					}
-					console.log('re-fetched file complete');
-					console.log('remoteFile = ' + chapter.items[pageIndex]['remoteFile']);
-					console.log('absoluteFile = ' + chapter.items[pageIndex]['absoluteFile']);
-					console.log('part.absoluteFile = ' + part['absoluteFile']);
-					console.log('reDownloadPage might need some reinitialize to redraw image');
-					followMeImage.imageSource = part['absoluteFile'];
-				}
-			}
-
 			onImageError: {
 				console.log("image has error, redownloading it...");
 				app.downloadQueue.immediate({
@@ -216,11 +194,11 @@ Page {
 			}
 			// fetch them online (not from dir)
 			console.log('downloading chapter');
-			//downloadChapter.activate();
 			// make a chapter start
 			if (chapter == undefined) {
 				chapter = ({id: parentEntry.items[current].id, file: parentEntry.items[current].file, label: parentEntry.items[current].label, items: [], last: -1, read: false});
 			}
+			// TODO: when it's done, i need to do the same stuff if it were successfull in loading...
 			app.downloadQueue.immediate({
 				locator: loadChapter.locator,
 				depth: 1,
