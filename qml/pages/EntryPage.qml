@@ -14,6 +14,7 @@ Page {
 	property var partModel: chapter != undefined && chapter.items != undefined ? chapter.items : []
 
 	signal gotoSibling (int number)
+	signal chapterLoaded ()
 	signal markRead (bool force)
 	signal markLast ()
 
@@ -184,12 +185,8 @@ Page {
 				if (entry.label != undefined) {
 					parentEntry.items[current].label = entry.label;
 				}
-				markLast();
 				chapter = entry;
-				entryView.model = partModel;
-				console.log("saving to chapter: " + entryPage.current);
-				// mark it as read
-				markRead(false);
+				chapterLoaded();
 				return ;
 			}
 			// fetch them online (not from dir)
@@ -206,6 +203,20 @@ Page {
 				entry: chapter
 			});
 		}
+	}
+
+	onChapterLoaded: {
+		markLast();
+		entryView.model = partModel;
+
+		// mark it as read
+		console.log("saving to chapter: " + entryPage.current);
+		markRead(false);
+
+		// fix the cover
+		app.coverPage.primaryText = parentEntry.label;
+		app.coverPage.secondaryText = parentEntry.locator[0].label;
+		app.coverPage.chapterText = 'Chapter: ' + (parentEntry.items[current].label != undefined ? parentEntry.items[current].label : parentEntry.items[current].id);
 	}
 
 	onMarkRead: {

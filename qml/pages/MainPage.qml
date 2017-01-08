@@ -53,6 +53,11 @@ Page {
 
 		PullDownMenu {
 			MenuItem {
+				visible: app.downloadQueue.running
+				text: qsTr("Stop downloading");
+				onClicked: app.downloadQueue.stop(function (){});
+			}
+			MenuItem {
 				text: qsTr("Search");
 				onClicked: pageStack.push(Qt.resolvedUrl("SearchPage.qml"))
 			}
@@ -254,6 +259,9 @@ Page {
 					return (a.last != undefined && a.last > 0 ? (a.last == a.items[a.items.length - 1].id ? 1 : -1) : 0) - (b.last != undefined && b.last > 0 ? (b.last == b.items[b.items.length - 1].id ? 1 : -1) : 0);
 				});
 				entryList.model = entryModel;
+				app.coverPage.primaryText = entries.length + ' followed';
+				app.coverPage.secondaryText = '';
+				app.coverPage.chapterText = '';
 			}
 		}
 	}
@@ -300,6 +308,14 @@ Page {
 	}
 
 	onStatusChanged: {
+		if (entryModel != undefined && entryModel.length > 0) {
+			app.coverPage.primaryText = entryModel.length + ' followed';
+		}
+		else {
+			app.coverPage.primaryText = 'Loading...';
+		}
+		app.coverPage.secondaryText = '';
+		app.coverPage.chapterText = '';
 		if (status == 1 && app.dirtyList && app.pluginsReady) {
 			console.log("status changed and main list is dirty and plugins were ready");
 			refreshList();
