@@ -600,7 +600,7 @@ Item {
 
 		// signal the done Handler for the item
 		console.log('trigger doneHandler of the item');
-		var results = item['doneHandler'](success, item, filename);
+		var results = item['doneHandler'](success, item, filename, saveEntry);
 
 		// no expanding required
 
