@@ -4,6 +4,7 @@ import Sailfish.Silica 1.0
 ListItem {
 	property string primaryText
 	property string secondaryText
+	property string sizeText
 	property string last
 	property string total
 	property bool starred
@@ -50,16 +51,36 @@ ListItem {
 		}
 	}
 
-	Label {
-		visible: detail
-		text: last + '/' + total
-		color: Theme.secondaryColor
-		font.pixelSize: Theme.fontSizeSmall
+	Row {
+		spacing: Theme.paddingLarge
 		anchors {
 			right: parent.right
-			rightMargin: Theme.paddingMedium
 			bottom: parent.bottom
-			bottomMargin: Theme.paddingSmall
+		}
+
+		Label {
+			text: sizeText
+			color: Theme.secondaryColor
+			font.pixelSize: Theme.fontSizeSmall
+			anchors {
+				leftMargin: Theme.paddingMedium
+				rightMargin: Theme.paddingMedium
+				bottom: parent.bottom
+				bottomMargin: Theme.paddingSmall
+			}
+		}
+
+		Label {
+			visible: detail
+			text: last + '/' + total
+			color: Theme.secondaryColor
+			font.pixelSize: Theme.fontSizeSmall
+			anchors {
+				leftMargin: Theme.paddingMedium
+				rightMargin: Theme.paddingMedium
+				bottom: parent.bottom
+				bottomMargin: Theme.paddingSmall
+			}
 		}
 	}
 }

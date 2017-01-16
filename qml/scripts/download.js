@@ -78,3 +78,23 @@ function getAbsoluteFile(base, locator, remoteFile) {
 	}
 	return folder + '/' + file;
 }
+
+/** formatBytes(size)
+ * show an integer (size) as a string with unit bytes
+ */
+function formatBytes(size) {
+	size = parseInt(size);
+	if (size < 2048) {
+		return '< 1KB';
+	}
+	size = size >> 10;
+	if (size < 2048) {
+		return size + ' KB';
+	}
+	size = size >> 10;
+	if (size < 2048) {
+		return size + ' MB';
+	}
+	size = size >> 10;
+	return size + ' GB';
+}

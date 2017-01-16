@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import "../components"
+import "../scripts/download.js" as Utils
 
 Page {
 	id: "mainPage"
@@ -144,6 +145,20 @@ Page {
 			PySaveEntry {
 				id: "saveEntry"
 				base: app.dataPath
+			}
+
+			PySizeEntry {
+				id: "sizeEntry"
+				base: app.dataPath
+				locator: entryItem.locator
+
+				autostart: entryItem.items.length > 0 && entryItem.last != undefined && entryItem.last != -1
+
+				onFinished: {
+					if (success) {
+						followMeItem.sizeText = Utils.formatBytes(size);
+					}
+				}
 			}
 
 			onMarkUnWanted: {

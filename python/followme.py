@@ -152,3 +152,30 @@ def downloadData(base, locator, suffix, remotefile, redownload):
         success = str(e)
     return (name, success)
 
+def getFolderSize(folder):
+    total_size = 0
+    try:
+        dirlist = os.listdir(folder)
+    except:
+        dirlist = []
+        pass
+    try:
+        total_size = os.path.getsize(folder)
+    except:
+        pass
+    for item in dirlist:
+        itempath = os.path.join(folder, item)
+        if os.path.isfile(itempath):
+            try:
+                total_size += os.path.getsize(itempath)
+            except:
+                pass
+        elif os.path.isdir(itempath):
+            total_size += getFolderSize(itempath)
+    return total_size
+
+def dataSize(base, locator):
+    # determine the parent folder
+    folder = locateFolder(base, locator)
+    # return the recursive folder size
+    return getFolderSize(folder)
