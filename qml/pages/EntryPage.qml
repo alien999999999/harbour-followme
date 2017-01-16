@@ -194,10 +194,16 @@ Page {
 			}
 			// fetch them online (not from dir)
 			console.log('downloading chapter');
-			// make a chapter start
+			// show busyIndicator by destroying the chapter items
+			// make a chapter start (either it's gotten corrupted, or it's a new one)
+			entryView.model = [];
 			if (chapter == undefined) {
 				chapter = ({id: parentEntry.items[current].id, file: parentEntry.items[current].file, label: parentEntry.items[current].label, items: [], last: -1, read: false});
 			}
+			else {
+				chapter = ({id: parentEntry.items[current].id, file: parentEntry.items[current].file, label: parentEntry.items[current].label, items: [], last: -1, read: false});
+			}
+			entryView.model = partModel;
 			// TODO: when it's done, i need to do the same stuff if it were successfull in loading...
 			app.downloadQueue.immediate({
 				locator: loadChapter.locator,
