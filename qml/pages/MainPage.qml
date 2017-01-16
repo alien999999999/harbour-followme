@@ -147,6 +147,15 @@ Page {
 				base: app.dataPath
 			}
 
+			PyCleanEntry {
+				id: "cleanEntry"
+				base: app.dataPath
+
+				onFinished: {
+					sizeEntry.activate();
+				}
+			}
+
 			PySizeEntry {
 				id: "sizeEntry"
 				base: app.dataPath
@@ -218,6 +227,34 @@ Page {
 								});
 							}
 						});
+					}
+				}
+				MenuItem {
+					visible: entryItem.items.length > 1 && entryItem.last != undefined && entryItem.last != -1 && entryItem.last != entryItem.items[0].id && entryItem.last != entryItem.items[0].label
+					text: qsTr("Cleanup read chapters")
+					onClicked: {
+						//remorseTimer
+						// if all is read, just clean the whole item
+						if (entryItem.last == entryItem.items[entryItem.items.length - 1].label) {
+							console.log('cleaning up all of ' + entryItem.locator[entryItem.locator.length - 1].label);
+							cleanEntry.locators = [entryItem.locator]
+							cleanEntry.activate();
+						}
+						else {
+							// add until last is found
+							cleanEntry.locators = []
+							for (var i in entryItem.items) {
+								// if last is found, start from here and break off the loop
+								if (entryItem.items[i].label == entryItem.last || entryItem.items[i].id == entryItem.last) {
+									console.log('found last item at index: ' + i);
+									console.log('cleaning up until ' + i + ' of ' + entryItem.locator[entryItem.locator.length - 1].label);
+									cleanEntry.activate();
+									break;
+								}
+								// add the next one too
+								cleanEntry.locators.push(entryItem.locator.concat([{id: entryItem.items[i].id, file: entryItem.items[i].file, label: entryItem.items[i].label}]));
+							}
+						}
 					}
 				}
 				MenuItem {

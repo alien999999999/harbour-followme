@@ -152,6 +152,39 @@ def downloadData(base, locator, suffix, remotefile, redownload):
         success = str(e)
     return (name, success)
 
+def cleanDirectory(folder, excludes):
+    nr = 0
+    try:
+        dirlist = os.listdir(folder)
+    except:
+        dirlist = []
+        raise
+    for name in dirlist:
+        if name not in excludes:
+            # determine the file absolute path
+            absoluteFile = os.path.join(folder, name)
+            # is it a directory?
+            if os.path.isdir(absoluteFile):
+                nr += cleanDirectory(absoluteFile, excludes)
+            else:
+                try:
+                    # remove the file
+                    os.unlink(absoluteFile)
+                    nr += 1
+                except:
+                    raise
+    return nr
+
+
+def cleanData(base, locators, excludes):
+    nr = 0
+    for locator in locators:
+        # determine the parent folder
+        folder = locateFolder(base, locator)
+        # clean the directory and return removed files
+        nr += cleanDirectory(folder, excludes)
+    return nr
+
 def getFolderSize(folder):
     total_size = 0
     try:
