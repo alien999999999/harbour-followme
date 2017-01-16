@@ -12,38 +12,43 @@ CoverBackground {
 		icon.source: "icon.png"
 	}
 
-	Label {
-		text: primaryText
-		color: Theme.primaryColor
-		truncationMode: TruncationMode.Fade
+	Column {
 		width: parent.width
-		anchors {
-			leftMargin: Theme.paddingMedium
-			topMargin: Theme.paddingSmall
-		}
-	}
 
-	Label {
-		text: secondaryText
-		color: Theme.secondaryColor
-		font.pixelSize: Theme.fontSizeSmall
-		truncationMode: TruncationMode.Fade
-		width: parent.width
-		anchors {
-			leftMargin: Theme.paddingMedium
-			topMargin: Theme.paddingSmall
+		Label {
+			text: primaryText
+			color: Theme.primaryColor
+			truncationMode: TruncationMode.Fade
+			width: parent.width
+			anchors {
+				leftMargin: Theme.paddingMedium
+				topMargin: Theme.paddingSmall
+			}
 		}
-	}
 
-	Label {
-		text: chapterText
-		color: Theme.primaryColor
-		truncationMode: TruncationMode.Fade
-		width: parent.width
-		anchors {
-			leftMargin: Theme.paddingMedium
-			topMargin: Theme.paddingSmall
+		Label {
+			text: secondaryText
+			color: Theme.secondaryColor
+			font.pixelSize: Theme.fontSizeSmall
+			truncationMode: TruncationMode.Fade
+			width: parent.width
+			anchors {
+				leftMargin: Theme.paddingMedium
+				topMargin: Theme.paddingSmall
+			}
 		}
+
+		Label {
+			text: chapterText
+			color: Theme.primaryColor
+			truncationMode: TruncationMode.Fade
+			width: parent.width
+			anchors {
+				leftMargin: Theme.paddingMedium
+				topMargin: Theme.paddingSmall
+			}
+		}
+
 	}
 
 	QueueProgress {
