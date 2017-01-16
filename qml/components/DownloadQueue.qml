@@ -231,16 +231,23 @@ Item {
 		if (item['doneHandler'] == undefined) {
 			if (item['remoteFile'] != undefined) {
 				item['doneHandler'] = function (success, item, filename, saveEntry){
+					console.log('default doneHandler for downloading (' + item['pageIndex'] + ': ' + filename + ')');
+					//console.log('chapter items: ' + item['chapter'].items.length);
 					if (success && item['chapter'] != undefined && item['pageIndex'] != undefined && item['chapter'].items[item['pageIndex']] != undefined && item['chapter'].items[item['pageIndex']]['absoluteFile'] != filename) {
 						item['chapter'].items[item['pageIndex']]['absoluteFile'] = filename;
 						console.log('saving chapter after download (filename: ' + filename + ')');
-						saveEntry.save(item['chapter']);
+						saveEntry.save(item['chapter'], item['saveHandler']);
+					}
+					item['filename'] = filename;
+					if (item['signal'] != undefined) {
+						item['signal'](success, item);
 					}
 					return [];
 				};
 			}
 			else {
 				item['doneHandler'] = function (success, item, entries, saveEntry){
+					console.log('default doneHandler for fetching');
 					var res = [];
 					if (success) {
 						if (item['entry'] != undefined) {
@@ -277,7 +284,7 @@ Item {
 							for (var i in item['entry']) { console.log('  - ' + i + ': ' + item['entry'][i]); }
 
 							// save the entry
-							saveEntry.save(item['entry']);
+							saveEntry.save(item['entry'], item['saveHandler']);
 						}
 
 						// if depth wasn't 1, then this is not the end...
@@ -289,6 +296,10 @@ Item {
 									depth: item['depth'] == 0 ? 0 : item['depth'] - 1
 								};
 								console.log('add child request: locator length: ' + req.locator.length);
+
+								if (item['saveHandler'] != undefined) {
+									req['saveHandler'] = item['saveHandler'];
+								}
 
 								// transfer sort function to the child requests!
 								if (item['sort'] != undefined) {
@@ -319,6 +330,9 @@ Item {
 								res.push(req);
 							}
 						}
+					}
+					if (item['signal'] != undefined) {
+						item['signal'](success, item);
 					}
 					return res;
 				};

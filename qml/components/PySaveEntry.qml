@@ -3,6 +3,7 @@ import io.thp.pyotherside 1.3
 Python {
 	property string base
 	property var entry
+	property var handlers: []
 
 	signal finished (bool success, var entry)
 
@@ -18,8 +19,23 @@ Python {
 		});
 	}
 
-	function save(e) {
+	function finishAndDisconnect(s, e) {
+		for (var i in handlers) {
+			handlers[i](s, e);
+		}
+		handlers = [];
+	}
+
+	function addHandler(h) {
+		handlers.push(h);
+	}
+
+	function save(e, h) {
 		entry = e;
+		if (h != undefined) {
+			addHandler(h);
+		}
+		finished.connect(finishAndDisconnect);
 		activate();
 	}
 
