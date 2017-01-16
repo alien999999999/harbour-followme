@@ -57,20 +57,14 @@ Page {
 
 			signal refreshImage()
 			signal refreshImageFilename()
+			signal imageSaved(bool success, var entry)
 
 			onRefreshImageFilename: {
 				console.log("refreshing image filename...");
 				app.downloadQueue.immediate({
 					locator: parentLocator.concat([{id: part.id, file: part.file, label: part.label}]),
 					entry: entryPage.chapter,
-					signal: refreshImage,
-					saveHandler: function (success, entry) {
-						if (success) {
-							console.log('i should set imagesource to something useful, like this?: ' + entry.items[partIndex].remoteFile);
-							console.log('i should set imagesource to something useful, like this?: ' + entry.items[partIndex].absoluteFile);
-							//followMeImage.imageSource = item['chapter'].items[item['pageIndex']].absoluteFile;
-						}
-					}
+					signal: refreshImage
 				});
 			}
 
@@ -81,20 +75,18 @@ Page {
 					chapter: entryPage.chapter,
 					remoteFile: entryPage.chapter.items[partIndex]['remoteFile'],
 					pageIndex: partIndex,
-					saveHandler: function (success, entry) {
-						if (success) {
-							console.log('entry: ' + entry);
-							console.log('entry.label: ' + entry.label);
-							console.log('entry.items: ' + entry.items);
-							console.log('entry.items.length: ' + entry.items.length);
-							console.log('setting imageSource to ' + entry.items[partIndex].absoluteFile);
-							followMeImage.imageSource = entry.items[partIndex].absoluteFile;
-						}
-					}
+					saveHandler: imageSaved
 				}, function (){
 					console.log('immediate download has been queued, clearing the imageSource');
 					followMeImage.imageSource = '';
 				});
+			}
+
+			onImageSaved: {
+				if (success) {
+					console.log("image was saved properly, now it's time to set the imageSource");
+					followMeImage.imageSource = entryPage.chapter.items[followMeImage.partIndex].absoluteFile;
+				}
 			}
 
 			onImageError: {
@@ -205,6 +197,7 @@ Page {
 			else {
 				chapter = ({id: parentEntry.items[current].id, file: parentEntry.items[current].file, label: parentEntry.items[current].label, items: [], last: -1, read: false});
 			}
+			partModel = chapter.items;
 			entryView.model = partModel;
 			// TODO: when it's done, i need to do the same stuff if it were successfull in loading...
 			app.downloadQueue.immediate({
@@ -217,7 +210,11 @@ Page {
 		}
 	}
 
-	onShowChapter: entryView.model = partModel;
+	onShowChapter: {
+		console.log('chapter now has ' + chapter.items.length + ' parts, setting model (maybe reset is required first?)');
+		partModel = chapter.items;
+		entryView.model = partModel;
+	}
 
 	onChapterLoaded: {
 		markLast();
