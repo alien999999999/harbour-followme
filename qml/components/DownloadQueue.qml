@@ -42,6 +42,7 @@ Item {
 
 	property var queue: []
 	property int position: -1
+	property int lastInsert: -1
 	property bool running
 
 	property var interrupts: []
@@ -134,6 +135,7 @@ Item {
 				}
 			}
 		}
+		lastInsert = -1;
 		qChanged();
 
 		// trigger the cleanup handlers
@@ -147,7 +149,15 @@ Item {
          * should only be called when the queue is in a non-busy state
          */
 	function doImmediate(item, handler) {
-		queue.splice(position + 1, 0, normalize(item));
+		// child inserts (ie: same originator), will be truely inserted, but the others will be appended after the last insert (in reminder of the inserting)
+		normalize(item);
+		var insertPoint = lastInsert + 1;
+		// by default, insert after the last insert, except in children
+		if (lastInsert == -1 || item.originator == queue[position].originator) {
+			insertPoint = position + 1;
+		}
+		queue.splice(insertPoint, 0, item);
+		lastInsert = insertPoint;
 		qChanged();
 
 		// trigger the cleanup handlers
@@ -365,6 +375,7 @@ Item {
 		// get the next position
 		if (!nextPosition()) {
 			console.warn('stop due to no next position!');
+			lastInsert = -1;
 			stopped();
 			return ;
 		}
@@ -376,6 +387,7 @@ Item {
 		if (item['locator'] == undefined) {
 			console.error("locator at queue[" + position + "] needs to be defined");
 			// TODO: check for continue on error
+			lastInsert = -1;
 			stopped();
 			return ;
 		}
@@ -429,6 +441,7 @@ Item {
 		// check if nothing left
 		console.log('ok, so, position is ' + position + ' but queue length is ' + queue.length);
 		if ((position + 1) >= queue.length || requestedDownloadStop) {
+			lastInsert = -1;
 			stopped();
 			running = false;
 			if (cleanupOnStop && (position + 1) >= queue.length) {
