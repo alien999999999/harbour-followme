@@ -14,6 +14,7 @@ Page {
 	property var partModel: chapter != undefined && chapter.items != undefined ? chapter.items : []
 
 	signal gotoSibling (int number)
+	signal showChapter (bool success, var item)
 	signal chapterLoaded ()
 	signal markRead (bool force)
 	signal markLast ()
@@ -54,58 +55,60 @@ Page {
 			file: part.file
 			absoluteFile: part.absoluteFile != undefined ? part.absoluteFile : ''
 
-			onImageError: {
-				console.log("image has error, redownloading it...");
+			signal refreshImage()
+			signal refreshImageFilename()
+
+			onRefreshImageFilename: {
+				console.log("refreshing image filename...");
 				app.downloadQueue.immediate({
 					locator: parentLocator.concat([{id: part.id, file: part.file, label: part.label}]),
-					remoteFile: entryPage.chapter.items[partIndex]['remoteFile'],
-					doneHandler: function (success, item, filename, saveEntry){
-						if (!success) {
-							//followMeImage.imageSource = item['remoteFile'];
-							return [];
+					entry: entryPage.chapter,
+					signal: refreshImage,
+					saveHandler: function (success, entry) {
+						if (success) {
+							console.log('i should set imagesource to something useful, like this?: ' + entry.items[partIndex].remoteFile);
+							console.log('i should set imagesource to something useful, like this?: ' + entry.items[partIndex].absoluteFile);
+							//followMeImage.imageSource = item['chapter'].items[item['pageIndex']].absoluteFile;
 						}
-						if (success && item['chapter'] != undefined && item['pageIndex'] != undefined && item['chapter'].items[item['pageIndex']] != undefined && item['chapter'].items[item['pageIndex']]['absoluteFile'] != filename) {
-							item['chapter'].items[item['pageIndex']].absoluteFile = filename;
-							followMeImage.imageSource = item['chapter'].items[item['pageIndex']].absoluteFile;
-							saveEntry.locator = parentLocator;
-							saveEntry.save(item['chapter']);
-							console.log('saving entry after download (filename: ' + filename + ')');
-						}
-						return [];
 					}
-				},
-				function (){
-					console.log('starting download after error');
 				});
+			}
+
+			onRefreshImage: {
+				console.log("refreshing image (ie: re-download " + entryPage.chapter.items[partIndex]['remoteFile'] + ")...");
+				app.downloadQueue.immediate({
+					locator: parentLocator.concat([{id: part.id, file: part.file, label: part.label},{}]),
+					chapter: entryPage.chapter,
+					remoteFile: entryPage.chapter.items[partIndex]['remoteFile'],
+					pageIndex: partIndex,
+					saveHandler: function (success, entry) {
+						if (success) {
+							console.log('entry: ' + entry);
+							console.log('entry.label: ' + entry.label);
+							console.log('entry.items: ' + entry.items);
+							console.log('entry.items.length: ' + entry.items.length);
+							console.log('setting imageSource to ' + entry.items[partIndex].absoluteFile);
+							console.log('setting imageSource to ' + entry.items[partIndex].absoluteFile);
+							followMeImage.imageSource = entry.items[partIndex].absoluteFile;
+						}
+					}
+				});
+			}
+
+			onImageError: {
+				console.log("image has error, redownloading it...");
+				if (entryPage.chapter.items[partIndex]['remoteFile'] != undefined) {
+					refreshImage();
+				}
+				else {
+					refreshImageFilename();
+				}
 			}
 
 			menu: ContextMenu {
 				MenuItem {
 					text: "Refresh"
-					onClicked: {
-						app.downloadQueue.immediate({
-							locator: parentLocator.concat([{id: part.id, file: part.file, label: part.label}]),
-							remoteFile: entryPage.chapter.items[partIndex]['remoteFile'],
-							redownload: true,
-							doneHandler: function (success, item, filename, saveEntry){
-								if (!success) {
-									//followMeImage.imageSource = item['remoteFile'];
-									return [];
-								}
-								if (success && item['chapter'] != undefined && item['pageIndex'] != undefined && item['chapter'].items[item['pageIndex']] != undefined && item['chapter'].items[item['pageIndex']]['absoluteFile'] != filename) {
-									item['chapter'].items[item['pageIndex']].absoluteFile = filename;
-									followMeImage.imageSource = item['chapter'].items[item['pageIndex']].absoluteFile;
-									saveEntry.locator = parentLocator;
-									saveEntry.save(item['chapter']);
-									console.log('saving entry after download (filename: ' + filename + ')');
-								}
-								return [];
-							}
-						},
-						function (){
-							console.log('starting redownload');
-						});
-					}
+					onClicked: refreshImage();
 				}
 			}
 		}
@@ -200,10 +203,13 @@ Page {
 				locator: loadChapter.locator,
 				depth: 1,
 				sort: true,
-				entry: chapter
+				entry: chapter,
+				signal: showChapter
 			});
 		}
 	}
+
+	onShowChapter: entryView.model = partModel;
 
 	onChapterLoaded: {
 		markLast();
