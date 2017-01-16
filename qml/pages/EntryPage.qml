@@ -88,10 +88,12 @@ Page {
 							console.log('entry.items: ' + entry.items);
 							console.log('entry.items.length: ' + entry.items.length);
 							console.log('setting imageSource to ' + entry.items[partIndex].absoluteFile);
-							console.log('setting imageSource to ' + entry.items[partIndex].absoluteFile);
 							followMeImage.imageSource = entry.items[partIndex].absoluteFile;
 						}
 					}
+				}, function (){
+					console.log('immediate download has been queued, clearing the imageSource');
+					followMeImage.imageSource = '';
 				});
 			}
 

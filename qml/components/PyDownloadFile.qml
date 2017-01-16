@@ -11,7 +11,7 @@ Python {
 
 	property bool autostart
 
-	signal finished (bool success, string filename)
+	signal finished (bool success, string filename, string absoluteFile)
 
 	function activate() {
 		addImportPath(Qt.resolvedUrl('../../python'));
@@ -22,15 +22,15 @@ Python {
 			console.log("base filename to be stored is: '" + locator[locator.length - 1]['id'] + "'");
 			call('followme.downloadData', [base, locator, suffix, url, redownload], function (result) {
 				console.log("filename should now be: " + result[0]);
-				if (result[1] !== true) {
-					console.error(result[1]);
+				if (result[2] !== true) {
+					console.error(result[2]);
 				}
-				finished(result[1] === true, result[0]);
+				finished(result[2] === true, result[0], result[1]);
 			});
 		});
 	}
 
-	onError: finished(false, '');
+	onError: finished(false, '', '');
 
 	Component.onCompleted: {
 		if (autostart) {

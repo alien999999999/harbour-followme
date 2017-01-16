@@ -14,7 +14,7 @@ Python {
 				console.error('entry needs a locator');
 			}
 			call('followme.saveData', [base, entry], function (result) {
-				finished(result != null, result);
+				finished(result != null, entry);
 			});
 		});
 	}

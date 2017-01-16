@@ -137,7 +137,7 @@ def downloadData(base, locator, suffix, remotefile, redownload):
     # get the absolute filename
     absoluteFile = os.path.join(folder, name)
     if os.path.isfile(absoluteFile) and not redownload:
-        return (name, success)
+        return (name, absoluteFile, success)
     try:
         import urllib.request
         req = urllib.request.Request(remotefile)
@@ -150,7 +150,7 @@ def downloadData(base, locator, suffix, remotefile, redownload):
     except Exception as e:
         pass
         success = str(e)
-    return (name, success)
+    return (name, absoluteFile, success)
 
 def cleanDirectory(folder, excludes):
     nr = 0

@@ -51,7 +51,7 @@ Item {
 	signal activated ()
 	signal qChanged ()
 	signal fetchDone (bool success, var entries)
-	signal downloadDone (bool success, string filename)
+	signal downloadDone (bool success, string filename, string absoluteFile)
 	signal stopped ()
 	signal itemNext ()
 
@@ -230,15 +230,21 @@ Item {
 		}
 		if (item['doneHandler'] == undefined) {
 			if (item['remoteFile'] != undefined) {
-				item['doneHandler'] = function (success, item, filename, saveEntry){
-					console.log('default doneHandler for downloading (' + item['pageIndex'] + ': ' + filename + ')');
-					//console.log('chapter items: ' + item['chapter'].items.length);
-					if (success && item['chapter'] != undefined && item['pageIndex'] != undefined && item['chapter'].items[item['pageIndex']] != undefined && item['chapter'].items[item['pageIndex']]['absoluteFile'] != filename) {
-						item['chapter'].items[item['pageIndex']]['absoluteFile'] = filename;
-						console.log('saving chapter after download (filename: ' + filename + ')');
-						saveEntry.save(item['chapter'], item['saveHandler']);
+				item['doneHandler'] = function (success, item, absoluteFile, saveEntry){
+					console.log('default doneHandler for downloading (' + item['pageIndex'] + ': ' + absoluteFile + ')');
+					if (success && item['chapter'] != undefined && item['pageIndex'] != undefined && item['chapter'].items[item['pageIndex']] != undefined) {
+						// only save if it's needed, but trigger the handler either way
+						if (item['chapter'].items[item['pageIndex']]['absoluteFile'] != absoluteFile) {
+							item['chapter'].items[item['pageIndex']]['absoluteFile'] = absoluteFile;
+							console.log('saving chapter after download (filename: ' + absoluteFile + ')');
+							saveEntry.save(item['chapter'], item['saveHandler']);
+						}
+						else {
+							// trigger the handler even if it didn't need saving...
+							item['saveHandler'](success, item['chapter']);
+						}
 					}
-					item['filename'] = filename;
+					item['absoluteFile'] = absoluteFile;
 					if (item['signal'] != undefined) {
 						item['signal'](success, item);
 					}
@@ -607,6 +613,7 @@ Item {
 	onDownloadDone: {
 		var item = queue[position];
 		item['finished'] = true;
+		item['filename'] = filename;
 		console.log('downloadDone of ' + item + ' at queue position ' + position + '; filename: ' + filename);
 
 		// first handle the interrupts
@@ -614,7 +621,7 @@ Item {
 
 		// signal the done Handler for the item
 		console.log('trigger doneHandler of the item');
-		var results = item['doneHandler'](success, item, filename, saveEntry);
+		var results = item['doneHandler'](success, item, absoluteFile, saveEntry);
 
 		// no expanding required
 
