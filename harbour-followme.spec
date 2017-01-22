@@ -15,18 +15,18 @@ from several sources. The app keeps record of what you have read and can
 download them in the background.
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q
 
 %build
 
 %install
 rm -rf %{buildroot}
 
-pushd %{name}-%{version} >/dev/null
 mkdir -p %{buildroot}%{_datadir}/icons/hicolor/86x86/apps %{buildroot}%{_datadir}/applications %{buildroot}%{_datadir}/%{name}
 install %{name}.png %{buildroot}%{_datadir}/icons/hicolor/86x86/apps
-install -D qml python %{name}.svg %{buildroot}%{_datadir}/%{name}
-popd >/dev/null
+install %{name}.desktop %{buildroot}%{_datadir}/applications
+install %{name}.svg %{buildroot}%{_datadir}/%{name}
+cp -R qml python %{buildroot}%{_datadir}/%{name}/
 
 desktop-file-install --delete-original --dir %{buildroot}%{_datadir}/applications %{buildroot}%{_datadir}/applications/*.desktop
 
