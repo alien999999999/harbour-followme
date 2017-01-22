@@ -24,7 +24,7 @@ rm -rf %{buildroot}
 pushd %{name}-%{version} >/dev/null
 mkdir -p %{buildroot}%{_datadir}/icons/hicolor/86x86/apps %{buildroot}%{_datadir}/applications %{buildroot}%{_datadir}/%{name}
 install %{name}.png %{buildroot}%{_datadir}/icons/hicolor/86x86/apps
-install -D qml python %{buildroot}%{_datadir}/%{name}
+install -D qml python %{name}.svg %{buildroot}%{_datadir}/%{name}
 popd >/dev/null
 
 desktop-file-install --delete-original --dir %{buildroot}%{_datadir}/applications %{buildroot}%{_datadir}/applications/*.desktop
