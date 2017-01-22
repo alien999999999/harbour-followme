@@ -9,7 +9,6 @@ License:	GPLv2+
 Group:		Qt/Qt
 URL:		https://github.com/alien999999999/harbour-followme
 Source0:	%name-%version.tar.bz2
-BuildArch:	noarch
 
 %description
 
