@@ -59,6 +59,7 @@ Page {
 				onClicked: app.downloadQueue.stop(function (){});
 			}
 			MenuItem {
+				visible: false
 				text: qsTr("Search");
 				onClicked: pageStack.push(Qt.resolvedUrl("SearchPage.qml"))
 			}
