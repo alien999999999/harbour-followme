@@ -39,7 +39,7 @@ ListItem {
 	}
 
 	Image {
-		source: starred ? '../icons/starGold.svg' : '../icons/starGrey.svg'
+		source: starred ? '../images/starGold.svg' : '../images/starGrey.svg'
 		height: parent.height/2
 		sourceSize.height: height
 		fillMode: Image.PreserveAspectFit

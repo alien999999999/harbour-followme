@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="86"
+   height="86"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="harbour-followme.svg"
+   inkscape:export-filename="/home/alien/dev/upstream/github/harbour-followme/harbour-followme.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient3789-6">
+      <stop
+         style="stop-color:#1e9bff;stop-opacity:1;"
+         offset="0"
+         id="stop3791-0" />
+      <stop
+         style="stop-color:#00c8de;stop-opacity:1;"
+         offset="1"
+         id="stop3793-4" />
+    </linearGradient>
+    <linearGradient
+       gradientTransform="matrix(-1,0,0,1,86,0)"
+       y2="0"
+       x2="86"
+       y1="86"
+       x1="0"
+       gradientUnits="userSpaceOnUse"
+       id="linearGradient3030"
+       xlink:href="#linearGradient3789-6"
+       inkscape:collect="always" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="11.313708"
+     inkscape:cx="37.549903"
+     inkscape:cy="44.162118"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer4"
+     showgrid="true"
+     inkscape:window-width="1920"
+     inkscape:window-height="1140"
+     inkscape:window-x="-2"
+     inkscape:window-y="-3"
+     inkscape:window-maximized="1"
+     inkscape:snap-bbox="true"
+     inkscape:snap-global="true">
+    <inkscape:grid
+       type="xygrid"
+       id="grid2985"
+       empspacing="5"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:groupmode="layer"
+     id="layer4"
+     inkscape:label="Invulling Spreekballon"
+     style="display:inline">
+    <path
+       style="fill:none;fill-opacity:0;stroke:#000000;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 29.232233,12.87868 a 16,11 0 0 0 -16,11 16,11 0 0 0 16,11 16,11 0 0 0 3.013672,-0.205078 l 7.83789,6.349609 -2.158203,-7.912109 a 16,11 0 0 0 7.306641,-9.232422 16,11 0 0 0 -16,-11 z"
+       id="path5058"
+       inkscape:connector-curvature="0" />
+    <ellipse
+       style="fill:#cdde87;fill-opacity:1;stroke:#120000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path7442"
+       ry="18.353554"
+       rx="14.848351"
+       cy="64.154251"
+       cx="63.494797" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer1"
+     inkscape:label="Invulling mannetje"
+     style="display:inline">
+    <g
+       inkscape:groupmode="layer"
+       id="layer6"
+       inkscape:label="Invulling mannetje lichaam" />
+    <g
+       inkscape:groupmode="layer"
+       id="layer7"
+       inkscape:label="Invulling mannetje hoofd"
+       sodipodi:insensitive="true">
+      <circle
+         style="display:inline;fill:#ffccaa;fill-opacity:1;stroke:#000000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="path7426"
+         cx="63.406406"
+         cy="40.383884"
+         r="10.5" />
+    </g>
+    <g
+       inkscape:groupmode="layer"
+       id="layer5"
+       inkscape:label="Invulling mannetje haar"
+       style="display:inline"
+       sodipodi:insensitive="true">
+      <path
+         style="fill:#554400;fill-opacity:1;stroke:#000000;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 63.40625,27.259766 a 13.125,13.125 0 0 0 -12.130859,8.130859 13.125,13.125 0 0 0 7.888671,2.650391 13.125,13.125 0 0 0 8.216797,-2.894532 l 1.177735,3.88086 c 2.441942,-2.027728 3.292433,2.122128 1.734375,3.591797 l 4.240234,4.695312 a 13.125,13.125 0 0 0 1.998047,-6.929687 13.125,13.125 0 0 0 -13.125,-13.125 z"
+         id="circle7429"
+         inkscape:connector-curvature="0" />
+    </g>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Ebene"
+     style="display:inline"
+     transform="translate(0,-4)"
+     sodipodi:insensitive="true">
+    <path
+       style="fill:url(#linearGradient3030);fill-opacity:1"
+       d="m 1.7226562,0.30078125 c -0.78599995,0 -1.42187495,0.635875 -1.42187495,1.42187495 l 0,41.2773438 C 0.30078125,66.582 19.417,85.699219 43,85.699219 l 41.277344,0 c 0.786,0 1.421875,-0.635875 1.421875,-1.421875 L 85.699219,43 C 85.699219,19.418 66.583,0.30078125 43,0.30078125 l -41.2773438,0 z M 9.9785156,8.8398438 43,8.8398438 C 61.8664,8.8398438 77.160156,24.1344 77.160156,43 l 0,33.021484 c 0,0.6288 -0.509872,1.138672 -1.138672,1.138672 L 43,77.160156 C 24.1336,77.160156 8.8398438,61.8656 8.8398438,43 l 0,-33.0214844 c 0,-0.6288 0.5098718,-1.1386718 1.1386718,-1.1386718 z"
+       transform="translate(0,4)"
+       id="path11"
+       inkscape:connector-curvature="0" />
+  </g>
+</svg>

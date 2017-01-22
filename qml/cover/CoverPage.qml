@@ -9,7 +9,7 @@ CoverBackground {
 
 	CoverPlaceholder {
 		text: "FollowMe"
-		icon.source: "icon.png"
+		icon.source: "../../harbour-followme.svg"
 	}
 
 	Column {

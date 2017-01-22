@@ -44,7 +44,7 @@ Page {
 			}
 
 			Image {
-				source: want ? '../icons/starGold.svg' : '../icons/starGrey.svg'
+				source: want ? '../images/starGold.svg' : '../images/starGrey.svg'
 				height: label.height*3/4
 				sourceSize.height: height
 				fillMode: Image.PreserveAspectFit
