@@ -1,5 +1,6 @@
 %global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')
 %global __requires_exclude python\\(abi\\)
+%global __provides_exclude application\\(
 
 Name:		harbour-followme
 Version:	0.1
