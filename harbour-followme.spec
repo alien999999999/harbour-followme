@@ -11,6 +11,8 @@ Group:		Qt/Qt
 URL:		https://github.com/alien999999999/harbour-followme
 Source0:	%name-%version.tar.bz2
 BuildArch:	noarch
+Requires:	pyotherside-qml-plugin-python3-qt5 >= 1.3.0
+Requires:	sailfishsilica-qt5
 Requires:	libsailfishapp-launcher
 
 %description
