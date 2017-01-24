@@ -8,12 +8,12 @@ CoverBackground {
 	property string chapterText
 
 	CoverPlaceholder {
-		text: "FollowMe"
 		icon.source: "../../harbour-followme.svg"
 	}
 
 	Column {
 		width: parent.width
+		anchors.verticalCenter: parent.verticalCenter
 
 		Label {
 			text: primaryText
