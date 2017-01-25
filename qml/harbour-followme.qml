@@ -26,7 +26,6 @@ ApplicationWindow
 			return undefined;
 		}
 		console.log('there are ' + plugins.length + ' plugins: ');
-		for (var i in plugins) { console.log(' - ' + i); }
 		console.log('looking for plugin ' + locator[0].id);
 		return plugins[locator[0].id];
 	}
@@ -51,9 +50,9 @@ ApplicationWindow
 	}
 
 	PyListEntries {
+		id: "pluginEntries"
 		base: pluginPath
 		locator: []
-		autostart: true
 		event: "pluginFound"
 		eventHandler: pluginFound
 
@@ -64,6 +63,18 @@ ApplicationWindow
 		onFinished: {
 			pluginsReady = true;
 			pluginsCompleted();
+		}
+	}
+
+	PyDataPath {
+		path: "FollowMe"
+		autostart: true
+
+		onFinished: {
+			if (dataPath != '') {
+				app.dataPath = dataPath;
+				pluginEntries.activate();
+			}
 		}
 	}
 

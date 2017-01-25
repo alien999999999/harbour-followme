@@ -274,7 +274,6 @@ Page {
 			id: "listEntries"
 			base: app.dataPath
 			locator: []
-			//autostart: true
 			depth: 2
 			event: "entryReceived"
 			eventHandler: entryReceived

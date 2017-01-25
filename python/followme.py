@@ -1,9 +1,32 @@
 import pyotherside
 import os
 
+def dataPath(path):
+    # expand homedir
+    homePath = os.path.expanduser("~")
+    # if sdcard exists, we'll take this as base
+    dataPath = os.path.join(homePath, "sdcard")
+    if os.path.exists(dataPath):
+        dataPath = os.path.join(dataPath, path)
+        # make sure the folder exists
+        os.makedirs(dataPath, exist_ok = True)
+        return dataPath
+    # if not, we'll use the homePath as base
+    dataPath = homePath
+    if os.path.exists(dataPath):
+        dataPath = os.path.join(dataPath, path)
+        # make sure the folder exists
+        os.makedirs(dataPath, exist_ok = True)
+        return dataPath
+    # weird, not having a homePath
+    return ''
+
 # helper function to find the resulting folder from the locator (and base)
 def locateFolder(base, locator):
     folder = os.path.expanduser(base)
+    # if base does not exist, return None
+    if not os.path.exists(folder):
+        return None
     return os.path.join(folder, '/'.join([x['id'].replace('/','-') for x in locator]))
 
 # list files or directories from a certain locator (and in a certain depth)
@@ -12,6 +35,9 @@ def listData(base, locator, files = False, excludes = [], event = "received", de
     entries = []
     # find the folder
     folder = locateFolder(base, locator)
+    # return empty list if base does not exist
+    if folder is None:
+        return []
     try:
         dirlist = os.listdir(folder)
     except:
@@ -53,6 +79,9 @@ def listData(base, locator, files = False, excludes = [], event = "received", de
 def loadData(base, locator):
     # find the folder
     folder = locateFolder(base, locator)
+    # return error if base does not exist
+    if folder is None:
+        return {'error': 'base folder does not exist'}
     # determine the filename
     filename = folder + '/.FollowMe'
     # load the entry from the filename
@@ -104,6 +133,9 @@ def saveData(base, entry):
                 del item['locator']
     # find the folder
     folder = locateFolder(base, locator)
+    # return False if base does not exist
+    if folder is None:
+        return False
     # make sure the folder exists
     os.makedirs(folder, exist_ok = True)
     # determine the filename
@@ -127,6 +159,9 @@ def downloadData(base, locator, suffix, remotefile, redownload):
     fileitem = l.pop()
     # determine the parent folder
     folder = locateFolder(base, l)
+    # return False if base does not exist
+    if folder is None:
+        return ('', '', False)
     # make sure the directory exists
     try:
         os.makedirs(folder, exist_ok = True)
@@ -181,8 +216,10 @@ def cleanData(base, locators, excludes):
     for locator in locators:
         # determine the parent folder
         folder = locateFolder(base, locator)
-        # clean the directory and return removed files
-        nr += cleanDirectory(folder, excludes)
+        # skip cleaning if base does not exist
+        if folder is not None:
+            # clean the directory and return removed files
+            nr += cleanDirectory(folder, excludes)
     return nr
 
 def getFolderSize(folder):
@@ -210,5 +247,8 @@ def getFolderSize(folder):
 def dataSize(base, locator):
     # determine the parent folder
     folder = locateFolder(base, locator)
+    # return 0 if base does not exist
+    if folder is None:
+        return 0
     # return the recursive folder size
     return getFolderSize(folder)
