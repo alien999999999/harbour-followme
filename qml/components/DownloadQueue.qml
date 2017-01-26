@@ -458,6 +458,8 @@ Item {
 	 * check if there's a next to be done or not
 	 */
 	function handleNextOrEnd(success) {
+		// last chance for handling interrupts
+		handleInterrupts();
 		// check if nothing left
 		console.log('ok, so, position is ' + position + ' but queue length is ' + queue.length);
 		if ((position + 1) >= queue.length || requestedDownloadStop) {
