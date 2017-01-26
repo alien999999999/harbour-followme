@@ -53,7 +53,7 @@ Page {
 			partIndex: index
 			partId: part.id
 			file: part.file
-			absoluteFile: part.absoluteFile != undefined ? part.absoluteFile : ''
+			absoluteFile: part.absoluteFile != undefined ? app.dataPath + part.absoluteFile : ''
 
 			signal refreshImage()
 			signal refreshImageFilename()
@@ -85,7 +85,7 @@ Page {
 			onImageSaved: {
 				if (success) {
 					console.log("image was saved properly, now it's time to set the imageSource");
-					followMeImage.imageSource = entryPage.chapter.items[followMeImage.partIndex].absoluteFile;
+					followMeImage.imageSource = app.dataPath + entryPage.chapter.items[followMeImage.partIndex].absoluteFile;
 				}
 			}
 

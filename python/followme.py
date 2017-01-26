@@ -114,6 +114,14 @@ def loadData(base, locator):
                 del item['items']
             if 'locator' in item:
                 del item['locator']
+            if 'absoluteFile' in item and item['absoluteFile'].startswith('/home/'):
+                i = item['absoluteFile'].find('/FollowMe/')
+                if i >= 0:
+                    item['absoluteFile'] = item['absoluteFile'][i+9:]
+                else:
+                    i = item['absoluteFile'].find('/.FollowMe/')
+                    if i >= 0:
+                        item['absoluteFile'] = item['absoluteFile'][i+10:]
     return entry
 
 def saveData(base, entry):
@@ -172,7 +180,7 @@ def downloadData(base, locator, suffix, remotefile, redownload):
     # get the absolute filename
     absoluteFile = os.path.join(folder, name)
     if os.path.isfile(absoluteFile) and not redownload:
-        return (name, absoluteFile, success)
+        return (name, absoluteFile[len(base):], success)
     try:
         import urllib.request
         req = urllib.request.Request(remotefile)
@@ -185,7 +193,7 @@ def downloadData(base, locator, suffix, remotefile, redownload):
     except Exception as e:
         pass
         success = str(e)
-    return (name, absoluteFile, success)
+    return (name, absoluteFile[len(base):], success)
 
 def cleanDirectory(folder, excludes):
     nr = 0

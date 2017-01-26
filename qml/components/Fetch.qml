@@ -76,7 +76,7 @@ Ajax {
 				}
 			}
 			if (entry['remoteFile'] != undefined) {
-				entry['absoluteFile'] = Utils.getAbsoluteFile(app.dataPath, locator, entry['remoteFile']);
+				entry['absoluteFile'] = Utils.getAbsoluteFile(locator, entry['remoteFile']);
 			}
 			console.log('found id "' + id + '", file:"' + file + '", remoteFile: "' + remoteFile + '"');
 			received(entry);

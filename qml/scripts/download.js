@@ -67,12 +67,12 @@ function getSuffix(file) {
 /** getAbsoluteFile(remoteFile)
  * try to determine the absoluteFile 's name when downloaded
  */
-function getAbsoluteFile(base, locator, remoteFile) {
+function getAbsoluteFile(locator, remoteFile) {
 	var l = locator.slice();
 	var item = l.pop();
 	var suffix = getSuffix(remoteFile);
 	var file = item['id'].replace('/','-') + suffix;
-	var folder = base.replace('~', '/home/nemo');
+	var folder = '';
 	for (var i in l) {
 		folder += '/' + l[i]['id'].replace('/','-');
 	}

@@ -21,7 +21,7 @@ Python {
 			console.log('suffix for file is: ' + suffix);
 			console.log("base filename to be stored is: '" + locator[locator.length - 1]['id'] + "'");
 			call('followme.downloadData', [base, locator, suffix, url, redownload], function (result) {
-				console.log("filename should now be: " + result[0]);
+				console.log("filename should now be: " + result[0] + " with absoluteFile: " + result[1]);
 				if (result[2] !== true) {
 					console.error(result[2]);
 				}
