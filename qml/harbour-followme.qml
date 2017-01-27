@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import io.thp.pyotherside 1.3
+import org.nemomobile.configuration 1.0
 import "pages"
 import "cover"
 import "components"
@@ -49,6 +50,11 @@ ApplicationWindow
 		return isLevelType(locator, "image");
 	}
 
+	function saveDataPath() {
+		dataPathConfig.value = app.dataPath;
+		dataPathConfig.sync();
+	}
+
 	PyListEntries {
 		id: "pluginEntries"
 		base: pluginPath
@@ -67,12 +73,26 @@ ApplicationWindow
 	}
 
 	PyDataPath {
-		path: "FollowMe"
-		autostart: true
+		id: "pyDataPath"
+		path: "Downloads/FollowMe"
 
 		onFinished: {
 			if (dataPath != '') {
 				app.dataPath = dataPath;
+				pluginEntries.activate();
+			}
+		}
+	}
+
+	ConfigurationValue {
+		id: "dataPathConfig"
+		key: "/harbour-followme/dataPath"
+		Component.onCompleted: {
+			if (value == undefined) {
+				pyDataPath.activate();
+			}
+			else {
+				app.dataPath = value;
 				pluginEntries.activate();
 			}
 		}

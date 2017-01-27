@@ -2,6 +2,8 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 Dialog {
+	allowedOrientations: Orientation.Portrait | Orientation.Landscape
+
 	property alias title: header.title
 	property alias minimum: slider.minimumValue
 	property alias maximum: slider.maximumValue

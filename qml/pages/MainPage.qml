@@ -54,6 +54,20 @@ Page {
 
 		PullDownMenu {
 			MenuItem {
+				text: qsTr("Settings");
+				onClicked: {
+					var dialog = pageStack.push(Qt.resolvedUrl("SettingsDialog.qml"), {
+						dataPath: app.dataPath
+					});
+					dialog.accepted.connect(function (){
+						console.log("dataPath needs to be saved");
+						app.dataPath = dialog.dataPath;
+						app.saveDataPath();
+						refreshList();
+					});
+				}
+			}
+			MenuItem {
 				visible: app.downloadQueue.running
 				text: qsTr("Stop downloading");
 				onClicked: app.downloadQueue.stop(function (){});
