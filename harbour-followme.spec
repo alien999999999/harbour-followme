@@ -3,7 +3,7 @@
 %global __provides_exclude application\\(
 
 Name:		harbour-followme
-Version:	0.1
+Version:	0.2
 Release:	1
 Summary:	Follow manga and/or comics
 License:	GPLv2+
