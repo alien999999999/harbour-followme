@@ -23,17 +23,19 @@ ApplicationWindow
 	signal pluginsCompleted ()
 
 	function getPlugin(locator) {
+		// empty locators will never have a plugin
 		if (locator == undefined || locator.length == 0) {
 			return undefined;
 		}
-		console.log('there are ' + plugins.length + ' plugins: ');
-		console.log('looking for plugin ' + locator[0].id);
+		// check the plugin with the first locator's id
 		return plugins[locator[0].id];
 	}
 
 	function getLevel(locator) {
+		// get the plugin first
 		var plugin = getPlugin(locator);
-		console.log('plugin ' + plugin.label + ' levels ' + plugin.levels.length);
+		// if no plugin, then no level
+		// if locator is bigger than the maximum level, we'll return undefined
 		if (plugin == undefined || locator.length > plugin.levels.length) {
 			return undefined;
 		}
@@ -42,7 +44,8 @@ ApplicationWindow
 
 	function isLevelType(locator, type) {
 		var level = getLevel(locator);
-		console.log('locator with length ' + locator.length + '; has level type: ' + level.type);
+		// check if this level's type is what we expect
+		// if it's undefined, it's definately not what we expected :-)
 		return (level != undefined && level.type == type);
 	}
 

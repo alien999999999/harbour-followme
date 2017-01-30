@@ -22,30 +22,27 @@ function ajax(url, callback) {
  * if it fails, returns an empty string
  */
 function getURL(plugin, locator) {
-	console.log('Fetch: getURL(): locator length ' + locator.length);
 	var url = '';
 	var i = locator.length - 1;
 	while (i > 0) {
+		// first start with the file if it's defined, or the id otherwise
 		var u = (locator[i].file != undefined ? locator[i].file : locator[i].id);
-		console.log('Fetch: basic url: "' + u + '"');
+		// we need to encode it, except for / 's
 		u = encodeURIComponent(u).replace(/%2F/g, '/');
-		console.log('Fetch: encoded url: "' + u + '"');
 		i--;
+		// for each level, check with prefix and/or suffix + add the previous url parts to it
 		url = plugin.levels[i].filePrefix + u + plugin.levels[i].fileSuffix + url;
-		console.log('Fetch: url: "' + url + '" (' + i + ')');
-		console.log('Fetch: cumulative = ' + plugin.levels[i].fileCumulative);
+		// if this level is not cumulative, there's no reason to continue traversing
 		if (!plugin.levels[i].fileCumulative) {
 			break;
 		}
 	}
-	console.log('Fetch: prefixBase = ' + plugin.levels[i].filePrefixBase);
 	// prefixBase is only for the base part of the url (ie: where the cumulativeness stops
 	if (plugin.levels[i].filePrefixBase) {
 		url = plugin.url + url;
 	}
 	// path suffix is specific for the current level
 	if (locator.length <= plugin.levels.length && plugin.levels[locator.length - 1].pathSuffix != undefined) {
-		console.log('Fetch: pathSuffix = ' + plugin.levels[locator.length - 1].pathSuffix);
 		url = url + plugin.levels[locator.length - 1].pathSuffix;
 	}
 	return url;
