@@ -6,7 +6,7 @@
 			'label': "Manga",
 			'pathSuffix': "/alphabetical",
 			'preFilter': '<ul class="series_alpha">',
-			'filter': '[^]?<li><a href="/([^"]+)"> ?([^<]+?)</a>(<span class="mangacompleted">[^<]+?</span>)?</li>([^]?</ul>[^]*?<ul class="series_alpha">)?',
+			'filter': '[^]?<li><a href="/([^"]+)"> ?(.+?)</a>(<span class="mangacompleted">[^<]+?</span>)?</li>([^]?</ul>[^]*?<ul class="series_alpha">)?',
 			'filterName': 2,
 			'filterFile': 1,
 			'filePrefix': "/",
