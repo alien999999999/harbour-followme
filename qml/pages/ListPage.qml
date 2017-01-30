@@ -21,6 +21,7 @@ Page {
 			}
 
 			BusyIndicator {
+				anchors.horizontalCenter: parent.horizontalCenter
 				running: true
 				size: BusyIndicatorSize.Large
 				visible: listModel.count == 0

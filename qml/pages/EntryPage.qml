@@ -35,6 +35,7 @@ Page {
 			}
 
 			BusyIndicator {
+				anchors.horizontalCenter: parent.horizontalCenter
 				running: true
 				size: BusyIndicatorSize.Large
 				visible: entryView.count == 0

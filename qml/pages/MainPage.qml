@@ -34,6 +34,7 @@ Page {
 			}
 
 			BusyIndicator {
+				anchors.horizontalCenter: parent.horizontalCenter
 				running: true
 				size: BusyIndicatorSize.Large
 				visible: entryList.loading
