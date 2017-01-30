@@ -53,6 +53,7 @@ ApplicationWindow
 	function saveDataPath() {
 		dataPathConfig.value = app.dataPath;
 		dataPathConfig.sync();
+		createDataPath.activate();
 	}
 
 	PyListEntries {
@@ -72,6 +73,14 @@ ApplicationWindow
 		}
 	}
 
+	PyCreateDataPath {
+		id: "createDataPath"
+
+		onFinished: {
+			pluginEntries.activate();
+		}
+	}
+
 	PyDataPath {
 		id: "pyDataPath"
 		path: "Downloads/FollowMe"
@@ -79,7 +88,7 @@ ApplicationWindow
 		onFinished: {
 			if (dataPath != '') {
 				app.dataPath = dataPath;
-				pluginEntries.activate();
+				createDataPath.activate();
 			}
 		}
 	}
@@ -93,7 +102,7 @@ ApplicationWindow
 			}
 			else {
 				app.dataPath = value;
-				pluginEntries.activate();
+				createDataPath.activate();
 			}
 		}
 	}

@@ -21,6 +21,23 @@ def dataPath(path):
     # weird, not having a homePath
     return ''
 
+def createDataPath(path, filename):
+    if path is None:
+        return False
+    if path == '':
+        return False
+    if os.path.exists(path):
+        return False
+    # make sure the folder exists
+    try:
+        os.makedirs(path)
+    except:
+        pass
+        return False
+    # since we've created the path, we can also touch the .nomedia file
+    open(os.path.join(path, filename), 'a').close()
+    return True
+
 # helper function to find the resulting folder from the locator (and base)
 def locateFolder(base, locator):
     folder = os.path.expanduser(base)
