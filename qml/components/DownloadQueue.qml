@@ -356,7 +356,7 @@ Item {
 	function insert(items) {
 		// TODO: make sure this only happens between next items
 		for (var i in items) {
-			queue.splice(position + i + 1, 0, normalize(items[i]));
+			queue.splice(position + parseInt(i) + 1, 0, normalize(items[i]));
 		}
 		qChanged();
 	}

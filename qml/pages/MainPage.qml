@@ -219,7 +219,7 @@ Page {
 						var l = 0;
 						for (var i in entryItem.items) {
 							if (last == entryItem.items[i].id) {
-								l = i;
+								l = parseInt(i);
 							}
 						}
 						// start 1-based (because it's visible)
@@ -352,7 +352,7 @@ Page {
 		if (entry.last != undefined) {
 			for (var i in entry.items) {
 				if (entry.items[i].id == entry.last) {
-					entryIndex = i;
+					entryIndex = parseInt(i);
 				}
 			}
 		}
