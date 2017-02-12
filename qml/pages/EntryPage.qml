@@ -65,7 +65,8 @@ Page {
 				app.downloadQueue.immediate({
 					locator: parentLocator.concat([{id: part.id, file: part.file, label: part.label}]),
 					entry: entryPage.chapter,
-					signal: refreshImage
+					pageIndex: partIndex,
+					saveHandler: imageSaved
 				});
 			}
 
@@ -84,7 +85,7 @@ Page {
 			}
 
 			onImageSaved: {
-				if (success) {
+				if (success && entryPage.chapter.items[followMeImage.partIndex].absoluteFile != undefined && entryPage.chapter.items[followMeImage.partIndex].absoluteFile != '') {
 					console.log("image was saved properly, now it's time to set the imageSource");
 					followMeImage.imageSource = app.dataPath + entryPage.chapter.items[followMeImage.partIndex].absoluteFile;
 				}

@@ -231,7 +231,7 @@ Item {
 		if (item['doneHandler'] == undefined) {
 			if (item['remoteFile'] != undefined) {
 				item['doneHandler'] = function (success, item, absoluteFile, saveEntry){
-					console.log('default doneHandler for downloading (' + item['pageIndex'] + ': ' + absoluteFile + ')');
+					console.log('default doneHandler for downloading (' + item['pageIndex'] + ': ' + absoluteFile + '): ' + success);
 					if (success && item['chapter'] != undefined && item['pageIndex'] != undefined && item['chapter'].items[item['pageIndex']] != undefined) {
 						// only save if it's needed, but trigger the handler either way
 						if (item['chapter'].items[item['pageIndex']]['absoluteFile'] != absoluteFile) {
@@ -317,6 +317,11 @@ Item {
 									console.log('add download child request: "' + entries[i].remoteFile + '"');
 									if (entries[i].remoteFile != undefined) {
 										req['remoteFile'] = entries[i].remoteFile;
+										// if pageindex and entry are set, make sure to pass on the chapter and pageIndex
+										if (item['pageIndex'] != undefined && item['entry'] != undefined) {
+											req['chapter'] = item['entry'];
+											req['pageIndex'] = item['pageIndex'];
+										}
 									}
 									else {
 										console.error('no remoteFile found, so, no child request...');
