@@ -74,13 +74,18 @@ Page {
 				onClicked: app.downloadQueue.stop(function (){});
 			}
 			MenuItem {
-				visible: false
-				text: qsTr("Search");
-				onClicked: pageStack.push(Qt.resolvedUrl("SearchPage.qml"))
-			}
-			MenuItem {
 				text: qsTr("Browse");
 				onClicked: pageStack.push(Qt.resolvedUrl("AddEntryPage.qml"))
+			}
+			MenuItem {
+				text: qsTr("Search");
+				onClicked: {
+					pageStack.push(Qt.resolvedUrl("SearchDialog.qml"), {
+						title: qsTr("Search"),
+						searchLabel: qsTr("Name"),
+						searchString: ""
+					});
+				}
 			}
 			MenuItem {
 				text: qsTr("Check updates")

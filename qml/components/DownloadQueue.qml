@@ -330,8 +330,9 @@ Item {
 								}
 								else {
 									if (app.isLevelType(req.locator, "part")) {
-										console.log('add fetch child request for a part (no subdirs for this one!)');
+										console.log('add fetch child request for a part (no subdirs for this one!), page: ' + i);
 										req['entry'] = item['entry'];
+										req['pageIndex'] = i;
 									}
 									else {
 										console.log('add fetch child request');
@@ -433,6 +434,15 @@ Item {
 		// fetch entry
 		console.log("fetching an item: " + item['entry']);
 		fetcher.locator = item['locator'];
+		fetcher.searchName = '';
+		// this takes care of search requests
+		if (item['searchName'] != undefined) {
+			fetcher.searchName = item['searchName'];
+		}
+		// this takes care of needing provider in the entry results
+		if (item['needProvider'] != undefined) {
+			fetcher.needProvider = item['needProvider'];
+		}
 		fetcher.activate();
 	}
 

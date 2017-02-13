@@ -42,11 +42,6 @@ Page {
 
 		PullDownMenu {
 			MenuItem {
-				visible: app.plugins[provider].search != undefined
-				text: qsTr("Search");
-				onClicked: pageStack.push(Qt.resolvedUrl("SearchProviderPage.qml"), { 'provider': provider });
-			}
-			MenuItem {
 				text: qsTr("Refresh");
 				onClicked: {
 					favList.loading = true;

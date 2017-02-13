@@ -1,6 +1,7 @@
 {
 	'label': "OtakuSmash Comics",
 	'url': "https://www.otakusmash.com/read-comics/",
+	'search': False,
 	'levels': [
 		{
 			'label': "Comics",

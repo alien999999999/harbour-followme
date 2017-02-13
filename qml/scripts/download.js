@@ -48,6 +48,35 @@ function getURL(plugin, locator) {
 	return url;
 }
 
+/** searchURL(plugin, searchName)
+ * compile an URL for a search
+ * if it fails, returns an empty string
+ */
+function searchURL(plugin, searchName) {
+	var url = '';
+	// prefixBase is only for the base part of the url (ie: where the cumulativeness stops
+	if (plugin.search.filePrefixBase) {
+		url = plugin.url + url;
+	}
+	// path suffix is specific for the search
+	if (plugin.search.pathSuffix != undefined) {
+		url = url + plugin.search.pathSuffix;
+	}
+	// path query prefix is first (wrt query part)
+	if (plugin.search.pathQueryPrefix != undefined) {
+		url = url + plugin.search.pathQueryPrefix;
+	}
+	// path query needs to be added with the searchName
+	if (plugin.search.pathQuery != undefined) {
+		url = url + plugin.search.pathQuery + searchName;
+	}
+	// path query suffix is last
+	if (plugin.search.pathQuerySuffix != undefined) {
+		url = url + plugin.search.pathQuerySuffix;
+	}
+	return url;
+}
+
 /** getSuffix(file)
  * gets the suffix from a file
  */

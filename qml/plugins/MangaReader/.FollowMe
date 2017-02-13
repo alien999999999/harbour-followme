@@ -1,6 +1,22 @@
 {
 	'label': "MangaReader",
 	'url': "http://www.mangareader.net",
+	'search': {
+		'label': "Search",
+		'pathSuffix': "/actions/search/",
+		'pathQueryPrefix': "?",
+		'pathQuery': "q=",
+		'pathQuerySuffix': "",
+		'preFilter': "",
+		'filter': "([^|]+)\|[^|]+\|[^|]+\|[^|]+\|/?([^|]+)\|.+[^]?",
+		'filterName': 1,
+		'filterFile': 2,
+		'filePrefix': "",
+		'fileSuffix': "",
+		'fileCumulative': True,
+		'filePrefixBase': True,
+		'type': "list"
+	},
 	'levels': [
 		{
 			'label': "Manga",

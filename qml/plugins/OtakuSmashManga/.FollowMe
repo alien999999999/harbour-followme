@@ -1,6 +1,7 @@
 {
 	'label': "OtakuSmash Manga",
 	'url': "https://www.otakusmash.com/read-manga/",
+	'search': False,
 	'levels': [
 		{
 			'label': "Comics",

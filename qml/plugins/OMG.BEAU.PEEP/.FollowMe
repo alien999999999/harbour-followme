@@ -1,6 +1,7 @@
 {
 	'label': "OMG.BEAU.PEEP",
 	'url': "http://www.omgbeaupeep.com/comics/",
+	'search': False,
 	'levels': [
 		{
 			'label': "Comics",
