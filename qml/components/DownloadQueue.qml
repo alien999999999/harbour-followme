@@ -263,34 +263,41 @@ Item {
 								item['entry'].locator = item['locator'];
 							}
 
+							var changedData = false;
+
 							// don't forget to set the actual entries
 							if (app.isLevelType(item['locator'], "part")) {
 								console.log('need to assign remoteFile');
 								for (var i in item['entry'].items) {
 									if (item['entry'].items[i].id == item['locator'][item['locator'].length - 1].id) {
-										console.log('assigned remoteFile to item: ' + item['entry'].items[i]);
 										console.log('assigned remoteFile to item: ' + item['entry'].items[i].id);
-										item['entry'].items[i].remoteFile = entries[0].remoteFile;
-										if (entries[0].absoluteFile != undefined) {
+										if (item['entry'].items[i].remoteFile != entries[0].remoteFile) {
+											changedData = true;
+											item['entry'].items[i].remoteFile = entries[0].remoteFile;
+										}
+										if (entries[0].absoluteFile != undefined && item['entry'].items[i].absoluteFile != entries[0].absoluteFile) {
+											changedData = true;
 											item['entry'].items[i].absoluteFile = entries[0].absoluteFile;
 										}
 									}
 								}
 							}
 							else {
-								item['entry'].items = entries;
+								if (item['entry'].items == undefined || item['entry'].items.length != entries.length) {
+									changedData = true;
+									item['entry'].items = entries;
+								}
 							}
 							console.log('saving entry after fetch (items: ' + entries.length + ')');
-							for (var i in item['entry'].locator) { console.log('  - ' + i + ': ' + item['entry'].locator[i]); }
-							for (var i in item['entry'].locator[0]) { console.log('  - ' + i + ': ' + item['entry'].locator[0][i]); }
-							for (var i in item['entry'].locator[1]) { console.log('  - ' + i + ': ' + item['entry'].locator[1][i]); }
-							for (var i in item['entry'].locator[2]) { console.log('  - ' + i + ': ' + item['entry'].locator[2][i]); }
-							for (var i in item['entry'].locator[3]) { console.log('  - ' + i + ': ' + item['entry'].locator[3][i]); }
-							for (var i in item['entry'].locator[4]) { console.log('  - ' + i + ': ' + item['entry'].locator[4][i]); }
-							for (var i in item['entry']) { console.log('  - ' + i + ': ' + item['entry'][i]); }
 
-							// save the entry
-							saveEntry.save(item['entry'], item['saveHandler']);
+							if (changedData) {
+								// save the entry
+								saveEntry.save(item['entry'], item['saveHandler']);
+							}
+							else {
+								// trigger the handler even if it didn't need saving...
+								item['saveHandler'](success, item['entry']);
+							}
 						}
 
 						// if depth wasn't 1, then this is not the end...
