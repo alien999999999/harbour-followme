@@ -380,7 +380,7 @@ Item {
 		// get next item in queue
 		do {
 			position++;
-			if (!queue[position]['finished']) {
+			if (queue[position] != undefined && !queue[position]['finished']) {
 				item = queue[position];
 			}
 		} while (position < queue.length && item == undefined);
@@ -403,6 +403,7 @@ Item {
 			console.warn('stop due to no next position!');
 			lastInsert = -1;
 			stopped();
+			running = false;
 			return ;
 		}
 		running = true;
@@ -415,6 +416,7 @@ Item {
 			// TODO: check for continue on error
 			lastInsert = -1;
 			stopped();
+			running = false;
 			return ;
 		}
 		console.log("next locator has length: " + item['locator'].length);
