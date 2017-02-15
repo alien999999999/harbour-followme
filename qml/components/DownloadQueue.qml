@@ -241,7 +241,9 @@ Item {
 						}
 						else {
 							// trigger the handler even if it didn't need saving...
-							item['saveHandler'](success, item['chapter']);
+							if (item['saveHandler'] != undefined) {
+								item['saveHandler'](success, item['chapter']);
+							}
 						}
 					}
 					item['absoluteFile'] = absoluteFile;
@@ -296,7 +298,9 @@ Item {
 							}
 							else {
 								// trigger the handler even if it didn't need saving...
-								item['saveHandler'](success, item['entry']);
+								if (item['saveHandler'] != undefined) {
+									item['saveHandler'](success, item['entry']);
+								}
 							}
 						}
 
