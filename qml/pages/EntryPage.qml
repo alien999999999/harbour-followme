@@ -30,8 +30,8 @@ Page {
 			width: parent.width
 			height: header.height + Theme.paddingLarge
 			PageHeader {
-				id: "header"
-				title: parentEntry.label + ": " + "Chapter" + " " + (chapter != undefined && chapter.label != undefined ? chapter.label : ( parentEntry.items[current].label != undefined ? parentEntry.items[current].label : parentEntry.items[current].id ) )
+				id: "header" // TODO: fetch from plugin.levels[] instead of Chapter
+				title: parentEntry.label + ": " + qsTr("Chapter") + " " + (chapter != undefined && chapter.label != undefined ? chapter.label : ( parentEntry.items[current].label != undefined ? parentEntry.items[current].label : parentEntry.items[current].id ) )
 			}
 
 			BusyIndicator {
@@ -103,7 +103,7 @@ Page {
 
 			menu: ContextMenu {
 				MenuItem {
-					text: "Refresh"
+					text: qsTr("Refresh")
 					onClicked: refreshImage();
 				}
 			}
