@@ -251,7 +251,7 @@ Page {
 					}
 				}
 				MenuItem {
-					visible: entryItem.items.length > 1 && entryItem.last != undefined && entryItem.last != -1 && entryItem.last != entryItem.items[0].id && entryItem.last != entryItem.items[0].label
+					visible: entryItem.items.length > 0 && entryItem.last != undefined && entryItem.last != -1 && entryItem.last != entryItem.items[0].id && entryItem.last != entryItem.items[0].label
 					text: qsTr("Cleanup read chapters")
 					onClicked: {
 						//remorseTimer
