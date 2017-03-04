@@ -19,8 +19,13 @@ ApplicationWindow
 
 	property alias downloadQueue: dQueue
 	property alias coverPage: cp
+	property var mainList
 
 	signal pluginsCompleted ()
+	signal entryUpdate (string entryIndex)
+	signal insertSort (var entry)
+	signal moveSort (var entry, int i)
+	signal removedEntry (var entry)
 
 	function getPlugin(locator) {
 		// empty locators will never have a plugin

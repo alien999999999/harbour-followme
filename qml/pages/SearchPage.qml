@@ -77,7 +77,12 @@ Page {
 				console.log(entryItem);
 				entryItem.locator = [{id: entryItem.provider}, {id:entryItem.id, label: entryItem.label}];
 				saveEntry.save(entryItem);
-				app.dirtyList = true;
+				if (entryItem.want) {
+					app.insertSort(entryItem);
+				}
+				else {
+					app.removedEntry(entryItem);
+				}
 			}
 		}
 

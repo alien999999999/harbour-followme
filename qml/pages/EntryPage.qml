@@ -160,7 +160,6 @@ Page {
 
 		onFinished: {
 			console.log('saving chapter: ' + (success ? "ok" : "nok"));
-			app.dirtyList = true;
 		}
 	}
 
@@ -171,7 +170,6 @@ Page {
 
 		onFinished: {
 			console.log('saving entry: ' + (success ? "ok" : "nok"));
-			app.dirtyList = true;
 		}
 	}
 
@@ -215,11 +213,15 @@ Page {
 	onShowChapter: {
 		console.log('chapter now has ' + chapter.items.length + ' parts, setting model (maybe reset is required first?)');
 		partModel = chapter.items;
-		entryView.model = partModel;
+		//entryView.model = partModel;
+		if (success) {
+			chapterLoaded();
+		}
 	}
 
 	onChapterLoaded: {
 		console.log("chapter index " + entryPage.parentEntry.currentIndex + " has loaded: " + chapter.label);
+		partModel = chapter.items;
 		markLast();
 		entryView.model = partModel;
 		if (parentEntry.currentPage != undefined) {
@@ -258,12 +260,16 @@ Page {
 		// save last entry
 		parentEntry.last = parentEntry.items[parentEntry.currentIndex].id;
 		saveEntry.activate();
+		console.log('trying to signal entry update in main: ' + parentEntry.last);
+		app.entryUpdate(parentEntry.locator[0].id + '/' + parentEntry.locator[1].id);
 	}
 
 	onCalcCurrentCompletion: {
 		if (parentEntry.items.length > 0) {
-			if (entryView.indexAt(0, entryView.contentY + entryView.height) == entryView.count - 1) {
-				parentEntry.currentPage = parentEntry.items[parentEntry.items.length - 1].id;
+			if (entryView.count <= 1 || entryView.indexAt(0, entryView.contentY + entryView.height) == entryView.count - 1) {
+				if (parentEntry.items.length > 0) {
+					parentEntry.currentPage = parentEntry.items[parentEntry.items.length - 1].id;
+				}
 				parentEntry.currentCompletion = 1;
 				saveEntry.activate();
 			}
@@ -297,6 +303,7 @@ Page {
 		if (status == PageStatus.Deactivating) {
 			// when going back, store the currentCompletion
 			calcCurrentCompletion();
+			app.moveSort(parentEntry, -1);
 		}
 	}
 }

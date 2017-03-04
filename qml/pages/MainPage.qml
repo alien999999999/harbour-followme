@@ -8,16 +8,29 @@ Page {
 
 	allowedOrientations: Orientation.Portrait | Orientation.Landscape
 
-	property var entryModel: []
+	property var entryItems: ({})
 
 	signal gotoEntry (var entry)
 	signal refreshList ()
+	// update the model depending on sorting from entryItems
+	signal refreshedList ()
+	// signal to signify start of refreshing
+	signal startRefreshing ()
+	// signal for item update
+	signal entryUpdate (string entryIndex)
+	// signal triggered by downloadqueue
+	signal downloadedEntry (bool success, var item)
+	// signal to insert an item (sortedly)
+	signal insertSort (var entry)
+	// signal to move to fix sorting
+	signal moveSort (var entry, int i)
+	// signal to remove an item
+	signal removedEntry (var entry)
 
 	SilicaListView {
 		id: "entryList"
 
 		property bool loading
-		property bool firstTime
 
 		anchors {
 			top: parent.top
@@ -45,12 +58,12 @@ Page {
 			running: true
 			interactionMode: TouchInteraction.Pull
 			direction: TouchInteraction.Down
-			visible: entryList.firstTime
+			visible: entryList.count == 0
 		}
 
 		InteractionHintLabel {
 			text: "Pull to find something to follow"
-			visible: entryList.firstTime
+			visible: entryList.count == 0
 		}
 
 		PullDownMenu {
@@ -90,32 +103,41 @@ Page {
 			MenuItem {
 				text: qsTr("Check updates")
 				onClicked: {
-					for (var i in entryModel) {
+					for (var i in entryItems) {
 						app.downloadQueue.append({
-							locator: entryModel[i].locator,
-							entry: entryModel[i],
+							locator: entryItems[i].locator,
+							entry: entryItems[i],
 							depth: 1,
-							sort: true
+							sort: true,
+							signal: downloadedEntry
 						});
 					}
 				}
 			}
 		}
 
-		model: entryModel
+		model: ListModel {
+			id: 'entryModel'
+		}
 
 		delegate: FollowMeItem {
 			id: 'followMeItem'
 
-			property var entryItem: entryModel[index]
+			property var entryItem: entryItems[model.entryIndex]
 
 			signal markUnWanted (bool force)
 
-			primaryText: entryItem.label
-			secondaryText: entryItem.locator[0].label
-			last: entryItem.last == undefined || entryItem.last == -1 ? '??' : entryItem.last
-			total: entryItem.items == undefined || entryItem.items.length == 0 ? '??' : ( entryItem.items[entryItem.items.length - 1].label != undefined ? entryItem.items[entryItem.items.length - 1].label : entryItem.items[entryItem.items.length - 1].id)
-			starred: ( total == '??' || entryItem.last != total || entryItem.currentCompletion < 1)
+			signal entryUpdate ()
+
+			primaryText: model.label
+			secondaryText: model.provider
+			last: model.last
+			total: model.total
+			starred: ( model.total == '??' || model.last != model.total || entryItem.currentCompletion < 1)
+
+			/*onModelChanged: {
+				console.log("model changed... maybe we can trigger the size check");
+			}*/
 
 			onClicked: {
 				if (entryItem.items.length == 0) {
@@ -203,16 +225,22 @@ Page {
 				}
 			}
 
+			onEntryUpdate: {
+				console.log("entry update for " + entryItem.label);
+				console.log("entry update: entry has parts: " + entryItem.items.length);
+			}
+
 			menu: ContextMenu {
 				MenuItem {
 					visible: (entryItem.locator[0].id in app.plugins)
 					text: qsTr("Check updates")
 					onClicked: {
 						app.downloadQueue.append({
-							locator: entryModel[index].locator,
-							entry: entryModel[index],
+							locator: entryItem.locator,
+							entry: entryItem,
 							depth: 1,
-							sort: true
+							sort: true,
+							signal: downloadedEntry
 						});
 					}
 				}
@@ -300,10 +328,10 @@ Page {
 
 			signal entryReceived (var entry)
 
-			onStarted: entryList.loading = true;
+			onStarted: startRefreshing();
 				
 			onEntryReceived: {
-				// TODO: inserted Sorting using the insert!
+				// Fix old entries without label
 				if (entry.label == undefined) {
 					entry.label = item.id;
 				}
@@ -342,25 +370,17 @@ Page {
 				if (entry.locator[0].label == undefined) {
 					entry.locator[0].label = entry.locator[0].id;
 				}
-				if (entry.want == undefined || entry.want) {
-					entryModel.push(entry);
+
+				// set want if not defined yet
+				if (entry.want == undefined) {
+					entry.want = true;
 				}
 
-				// TODO: find something to display updated entryModel
+				// assign the item to a hash with the only unique identifier we know of... the relative path location
+				entryItems[entry.locator[0].id + '/' + entry.locator[1].id] = entry;
 			}
 
-			onFinished: {
-				entryList.loading = false;
-				entryList.firstTime = (entries.length == 0);
-				// show update entries
-				entryModel.sort(function (a,b) {
-					return (a.last != undefined && a.last > 0 ? (a.last == a.items[a.items.length - 1].id ? 1 : -1) : 0) - (b.last != undefined && b.last > 0 ? (b.last == b.items[b.items.length - 1].id ? 1 : -1) : 0);
-				});
-				entryList.model = entryModel;
-				app.coverPage.primaryText = entries.length + ' followed';
-				app.coverPage.secondaryText = '';
-				app.coverPage.chapterText = '';
-			}
+			onFinished: refreshedList();
 		}
 	}
 
@@ -390,18 +410,233 @@ Page {
 	}
 
 	onRefreshList: {
-		entryList.loading = true;
-		entryList.model = [];
-		entryModel = [];
-		entryList.model = entryModel;
 		console.log("reloading list");
 		listEntries.activate();
+	}
+
+	// signal to start before refreshing
+	onStartRefreshing: {
+		entryList.loading = true;
+		entryList.model.clear();
+	}
+
+	function compareEntry(a, b) {
+		var ascore = (entryItems[a].items.length == 0 ? -0.4 : (entryItems[a].currentIndex == undefined ? -0.5 : 
+			((entryItems[a].currentIndex + (entryItems[a].currentCompletion == undefined ? 0 : entryItems[a].currentCompletion)) / entryItems[a].items.length)
+		));
+		var bscore = (entryItems[b].items.length == 0 ? -0.4 : (entryItems[b].currentIndex == undefined ? -0.5 : 
+			((entryItems[b].currentIndex + (entryItems[b].currentCompletion == undefined ? 0 : entryItems[b].currentCompletion)) / entryItems[b].items.length)
+		));
+		var score = (bscore >= 1 ? -1 : bscore) - (ascore >= 1 ? -1 : ascore);
+		if (score == 0) {
+			var alabel = (entryItems[a].label != undefined ? entryItems[a].label : (entryItems[a].id != undefined ? entryItems[a].id : ''));
+			var blabel = (entryItems[b].label != undefined ? entryItems[b].label : (entryItems[b].id != undefined ? entryItems[b].id : ''));
+			score = (alabel.toLowerCase() < blabel.toLowerCase() ? -1 : (alabel.toLowerCase() > blabel.toLowerCase() ? 1 : 0));
+		}
+		return score;
+	}
+
+	/** binarySearch(entry, strict, i)
+	 * entry: the entry to check the position for
+	 * strict: bool
+	 *   true: just find the index in the list (default)
+	 *   false: find the place where the entry should be
+	 * i: startindex place to start searching (default is the middle)
+	 */
+	function binarySearch(entryIndex, strict, i) {
+		// starting index is halfway by default
+		if (i == undefined) {
+			i = entryList.model.count >> 1;
+		}
+
+		// strict mode is true by default
+		if (strict == undefined) {
+			strict == true;
+		}
+
+		// set the starting boundaries
+		var min = 0;
+		var max = entryList.model.count;
+
+		// loop until we're inside the boundaries
+		while (i >= min && i < max) {
+
+			// initialize variables
+			var skip = 0;
+
+			// find the current entry (on the index)
+			var e = entryList.model.get(i).entryIndex;
+
+			if (e == entryIndex) {
+				if (strict) {
+					// found the entry, so return it
+					return i;
+				}
+
+				// if not strict, this one is not correct, so we need to skip it
+				if (i > min) {
+					i = i - 1;
+					e = entryList.model.get(i).entryIndex;
+				}
+				else {
+					i = i + 1;
+					if (i == max) {
+						// if we're at max already, we can just return the actual entry (ie: unchanged)
+						return min;
+					}
+					e = entryList.model.get(i).entryIndex;
+				}
+			}
+
+			// compare the entry
+			var r = compareEntry(entryIndex, e);
+			if (!strict && r == 0) {
+				return i;
+			}
+			if (r < 0) {
+				max = i;
+				i = min + ((max - min) >> 1);
+			}
+			else {
+				min = i + 1;
+				i = max - ((max - min) >> 1);
+			}
+		}
+		return ( strict ? -1 : i );
+	}
+
+	onInsertSort: {
+		// get entryIndex
+		var entryIndex = entry.locator[0].id + '/' + entry.locator[1].id;
+
+		// make sure it exists before converting to a model Item
+		if (entryItems[entryIndex] == undefined) {
+			entryItems[entryIndex] = entry;
+		}
+
+		// convert to a modelItem
+		var modelItem = convertEntryToModel(entryItems, entryIndex);
+
+		// find the position and insert or append
+		var i = binarySearch(entryIndex, false);
+		if (i == entryList.model.count) {
+			entryList.model.append(modelItem);
+		}
+		else {
+			entryList.model.insert(i, modelItem);
+		}
+	}
+
+	onMoveSort: {
+		// get entryIndex
+		var entryIndex = entry.locator[0].id + '/' + entry.locator[1].id;
+
+		if (i == -1) {
+			i = binarySearch(entryIndex);
+		}
+		else {
+			var j = binarySearch(entryIndex, false, i);
+			if (i != j) {
+				entryList.model.move(i, j, 1);
+				// try to keep the moved item in view
+				entryList.positionViewAtIndex(j, ListView.Visible);
+			}
+		}
+	}
+
+	onRemovedEntry: {
+		// get entryIndex
+		var entryIndex = entry.locator[0].id + '/' + entry.locator[1].id;
+
+		var i = binarySearch(entryIndex);
+		if (i >= 0) {
+			entryList.model.remove(i);
+		}
+	}
+
+	function convertEntryToModel(entryItems, entryIndex, detail) {
+		var entryItem = entryItems[entryIndex];
+		var modelItem = ({
+			entryIndex: entryIndex,
+			detail: detail,
+			label: entryItem.label,
+			provider: entryItem.locator[0].label,
+			last: (entryItem.last != undefined && entryItem.last != -1 ? entryItem.last : '??'),
+			total: (entryItem.items.length > 0 ? (entryItem.items[entryItem.items.length - 1].label != undefined ? entryItem.items[entryItem.items.length - 1].label : entryItem.items[entryItem.items.length - 1].id) : '??')
+		});
+		if (modelItem.last.toString != undefined) {
+			modelItem.last = modelItem.last.toString();
+		}
+		return modelItem;
+	}
+
+	// loading must be true
+	// model must be empty
+	// entryItems must be filled in
+	onRefreshedList: {
+		var model = [];
+		// fill the list with all wanted ones
+		for (var i in entryItems) {
+			if (entryItems[i].want) {
+				model.push(i);
+			}
+		}
+
+		// sort alphabetically on Label first
+		// group on status (busy(completion (0-1))/new(0)/completed+read(-1))
+		model.sort(compareEntry);
+
+		// update the listview
+		for (var i in model) {
+			entryList.model.append(convertEntryToModel(entryItems, model[i]));
+		}
+		entryList.loading = false;
+
+		// update cover page
+		app.coverPage.primaryText = entryList.model.count + ' followed';
+		app.coverPage.secondaryText = '';
+		app.coverPage.chapterText = '';
+
+		// list has refreshed: it's not dirty anymore
 		app.dirtyList = false;
 	}
 
+	onEntryUpdate: {
+		console.log('signal entryUpdate had been triggered with ' + entryIndex);
+		var entryItem = entryItems[entryIndex];
+		var lastIndex = -1;
+		for (var i = 0; i < entryList.model.count; i++) {
+			if (entryList.model.get(i).entryIndex == entryIndex) {
+				// update the fields that can change in the model (last, total)
+				var l = (entryItem.last != undefined && entryItem.last != -1 ? entryItem.last : '??');
+				if (l.toString != undefined) {
+					l = l.toString();
+				}
+				var maxchapter = (entryItem.items.length > 0 ? (entryItem.items[entryItem.items.length - 1].label != undefined ? entryItem.items[entryItem.items.length - 1].label : entryItem.items[entryItem.items.length - 1].id) : '??');
+				console.log('updating last to ' + l);
+				console.log('updating total to ' + maxchapter);
+				entryList.model.get(i).last = l;
+				entryList.model.get(i).total = maxchapter;
+
+				// remember the index
+				lastIndex = i;
+			}
+		}
+
+		// it might be necessary to move this item to a better sorted position
+		moveSort(entryItem, lastIndex);
+	}
+
+	onDownloadedEntry: {
+		if (success) {
+			// update the model item
+			entryUpdate(item['entry'].locator[0].id + '/' + item['entry'].locator[1].id);
+		}
+	}
+
 	onStatusChanged: {
-		if (entryModel != undefined && entryModel.length > 0) {
-			app.coverPage.primaryText = entryModel.length + ' followed';
+		if (entryList.model != undefined && entryList.model.count > 0) {
+			app.coverPage.primaryText = entryList.model.count + ' followed';
 		}
 		else {
 			app.coverPage.primaryText = 'Loading...';
@@ -415,6 +650,11 @@ Page {
 	}
 
 	Component.onCompleted: {
+		app.mainList = entryList;
+		app.entryUpdate.connect(entryUpdate);
+		app.insertSort.connect(insertSort);
+		app.moveSort.connect(moveSort);
+		app.removedEntry.connect(removedEntry);
 		app.pluginsCompleted.connect(refreshList);
 	}
 }
