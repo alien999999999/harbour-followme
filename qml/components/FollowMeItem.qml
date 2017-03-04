@@ -25,7 +25,6 @@ ListItem {
 	}
 
 	Label {
-		visible: detail
 		text: secondaryText
 		color: Theme.secondaryColor
 		font.pixelSize: Theme.fontSizeSmall
