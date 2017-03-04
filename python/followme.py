@@ -156,6 +156,10 @@ def saveData(base, entry):
                 del item['items']
             if 'locator' in item:
                 del item['locator']
+            if 'currentIndex' in item:
+                del item['currentIndex']
+            if 'currentCompletion' in item:
+                del item['currentCompletion']
     # find the folder
     folder = locateFolder(base, locator)
     # return False if base does not exist

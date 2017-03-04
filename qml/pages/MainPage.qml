@@ -115,7 +115,7 @@ Page {
 			secondaryText: entryItem.locator[0].label
 			last: entryItem.last == undefined || entryItem.last == -1 ? '??' : entryItem.last
 			total: entryItem.items == undefined || entryItem.items.length == 0 ? '??' : ( entryItem.items[entryItem.items.length - 1].label != undefined ? entryItem.items[entryItem.items.length - 1].label : entryItem.items[entryItem.items.length - 1].id)
-			starred: ( entryItem.last != total )
+			starred: ( total == '??' || entryItem.last != total || entryItem.currentCompletion < 1)
 
 			onClicked: {
 				if (entryItem.items.length == 0) {
@@ -307,12 +307,38 @@ Page {
 				if (entry.label == undefined) {
 					entry.label = item.id;
 				}
-				if (entry.last == undefined) {
-					entry.last = -1;
-				}
+
+				// Add empty list of items if not defined yet
 				if (entry.items == undefined) {
 					entry.items = [];
 				}
+
+				// currentIndex will not be saved, so it needs to be recalculated.
+				// however, if this has never been looked at, we can't have 0 as currentIndex, we need to keep it undefined
+				// we can only find currentIndex if last is set
+
+				// set the last if not defined yet
+				if (entry.last == undefined) {
+					entry.last = -1;
+				}
+				else {
+					// track down the currentIndex comparing with last
+					for (var i in entry.items) {
+						if (entry.items[i].id == entry.last) {
+							entry.currentIndex = parseInt(i);
+						}
+					}
+				}
+
+				// set a currentCompletion if not defined yet
+				if (entry.currentCompletion == undefined) {
+					entry.currentCompletion = 0;
+					if (entry.items.length > 0 && entry.last == entry.items[entry.items.length - 1].label) {
+						entry.currentCompletion = 1;
+					}
+				}
+
+				// Fix setting label a (bad) label for provider (TODO: check if this is still needed)
 				if (entry.locator[0].label == undefined) {
 					entry.locator[0].label = entry.locator[0].id;
 				}
@@ -353,20 +379,14 @@ Page {
 
 	// MUST: entry.items.length > 0
 	onGotoEntry: {
-		var entryIndex = 0;
-		if (entry.last != undefined) {
-			for (var i in entry.items) {
-				if (entry.items[i].id == entry.last) {
-					entryIndex = parseInt(i);
-				}
-			}
-		}
 		console.log('last entry was: ' + entry.last);
-		console.log('go to entry with id: ' + entry.items[entryIndex].id);
-		pageStack.push(Qt.resolvedUrl("EntryPage.qml"), {
-			parentEntry: entry,
-			current: entryIndex
-		});
+		if (entry.currentIndex == undefined) {
+			entry.currentIndex = 0;
+		}
+		if (entry.items.length > 0) {
+			console.log('go to entry with id: ' + entry.items[entry.currentIndex].id);
+		}
+		pageStack.push(Qt.resolvedUrl("EntryPage.qml"), {parentEntry: entry});
 	}
 
 	onRefreshList: {

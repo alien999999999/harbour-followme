@@ -269,7 +269,8 @@ Item {
 
 							// don't forget to set the actual entries
 							if (app.isLevelType(item['locator'], "part")) {
-								console.log('need to assign remoteFile');
+								console.log('need to assign remoteFile only (in the entries)');
+								// find the old part first (in the entry's items)
 								for (var i in item['entry'].items) {
 									if (item['entry'].items[i].id == item['locator'][item['locator'].length - 1].id) {
 										console.log('assigned remoteFile to item: ' + item['entry'].items[i].id);

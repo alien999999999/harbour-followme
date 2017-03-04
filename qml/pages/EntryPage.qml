@@ -4,20 +4,23 @@ import "../components"
 
 Page {
 	id: "entryPage"
-	property var parentEntry
-	property int current
 
+	// this is set from the MainPage, it has a locator, items
+	property var parentEntry
+
+	property var chapterLocator: parentEntry.locator.concat([{id: parentEntry.items[parentEntry.currentIndex].id, file: parentEntry.items[parentEntry.currentIndex].file, label: parentEntry.items[parentEntry.currentIndex].label}])
 	property var chapter
 
-	property int prev: current < 0 ? -1 : current - 1
-	property int next: (current + 1) < parentEntry.items.length ? current + 1 : -1
-	property var partModel: chapter != undefined && chapter.items != undefined ? chapter.items : []
+	property int prev: parentEntry.currentIndex < 0 ? -1 : parentEntry.currentIndex - 1
+	property int next: (parentEntry.currentIndex + 1) < parentEntry.items.length ? parentEntry.currentIndex + 1 : -1
+	property var partModel: chapter != undefined && chapter.items != undefined ? chapter.items : ([])
 
 	signal gotoSibling (int number)
 	signal showChapter (bool success, var item)
 	signal chapterLoaded ()
 	signal markRead (bool force)
 	signal markLast ()
+	signal calcCurrentCompletion ()
 
 	allowedOrientations: Orientation.Portrait | Orientation.Landscape
 
@@ -31,7 +34,7 @@ Page {
 			height: header.height + Theme.paddingLarge
 			PageHeader {
 				id: "header" // TODO: fetch from plugin.levels[] instead of Chapter
-				title: parentEntry.label + ": " + qsTr("Chapter") + " " + (chapter != undefined && chapter.label != undefined ? chapter.label : ( parentEntry.items[current].label != undefined ? parentEntry.items[current].label : parentEntry.items[current].id ) )
+				title: parentEntry.label + ": " + qsTr("Chapter") + " " + (chapter != undefined && chapter.label != undefined ? chapter.label : ( parentEntry.items[parentEntry.currentIndex].label != undefined ? parentEntry.items[parentEntry.currentIndex].label : parentEntry.items[parentEntry.currentIndex].id ) )
 			}
 
 			BusyIndicator {
@@ -119,7 +122,7 @@ Page {
 				onClicked: {
 					var dialog = pageStack.push(Qt.resolvedUrl("SliderDialog.qml"), {
 						title: qsTr("Jump to chapter"),
-						number: entryPage.current + 1,
+						number: entryPage.parentEntry.currentIndex + 1,
 						unit: qsTr("chapter"),
 						minimum: 1,
 						maximum: entryPage.parentEntry.items.length
@@ -175,14 +178,15 @@ Page {
 	PyLoadEntry {
 		id: "loadChapter"
 		base: app.dataPath
-		locator: parentEntry.locator.concat([{id: parentEntry.items[current].id, file: parentEntry.items[current].file, label: parentEntry.items[current].label}])
+		locator: chapterLocator
 		autostart: true
 
 		onFinished: {
 			if (success) {
+				console.log("loading chapter finished: " + entry.label);
 				// fix label before saving parent
 				if (entry.label != undefined) {
-					parentEntry.items[current].label = entry.label;
+					parentEntry.items[parentEntry.currentIndex].label = entry.label;
 				}
 				chapter = entry;
 				chapterLoaded();
@@ -191,19 +195,15 @@ Page {
 			// fetch them online (not from dir)
 			console.log('downloading chapter');
 			// show busyIndicator by destroying the chapter items
-			// make a chapter start (either it's gotten corrupted, or it's a new one)
 			entryView.model = [];
-			if (chapter == undefined) {
-				chapter = ({id: parentEntry.items[current].id, file: parentEntry.items[current].file, label: parentEntry.items[current].label, items: [], last: -1, read: false});
-			}
-			else {
-				chapter = ({id: parentEntry.items[current].id, file: parentEntry.items[current].file, label: parentEntry.items[current].label, items: [], last: -1, read: false});
-			}
+			// make a chapter start (either it's gotten corrupted, or it's a new one)
+			// either way, create a new basic chapter to start with
+			chapter = ({id: parentEntry.items[parentEntry.currentIndex].id, file: parentEntry.items[parentEntry.currentIndex].file, label: parentEntry.items[parentEntry.currentIndex].label, items: [], read: false, locator: chapterLocator});
 			partModel = chapter.items;
 			entryView.model = partModel;
 			// TODO: when it's done, i need to do the same stuff if it were successfull in loading...
 			app.downloadQueue.immediate({
-				locator: loadChapter.locator,
+				locator: chapter.locator,
 				depth: 1,
 				sort: true,
 				entry: chapter,
@@ -219,17 +219,25 @@ Page {
 	}
 
 	onChapterLoaded: {
+		console.log("chapter index " + entryPage.parentEntry.currentIndex + " has loaded: " + chapter.label);
 		markLast();
 		entryView.model = partModel;
+		if (parentEntry.currentPage != undefined) {
+			for (var i in chapter.items) {
+				if (chapter.items[i].id == parentEntry.currentPage) {
+					entryView.positionViewAtIndex(parentEntry.currentPage, ListView.Visible);
+				}
+			}
+		}
 
 		// mark it as read
-		console.log("saving to chapter: " + entryPage.current);
+		console.log("saving to chapter: " + entryPage.parentEntry.currentIndex);
 		markRead(false);
 
 		// fix the cover
 		app.coverPage.primaryText = parentEntry.label;
 		app.coverPage.secondaryText = parentEntry.locator[0].label;
-		app.coverPage.chapterText = 'Chapter: ' + (parentEntry.items[current].label != undefined ? parentEntry.items[current].label : parentEntry.items[current].id);
+		app.coverPage.chapterText = 'Chapter: ' + (parentEntry.items[parentEntry.currentIndex].label != undefined ? parentEntry.items[parentEntry.currentIndex].label : parentEntry.items[parentEntry.currentIndex].id);
 	}
 
 	onMarkRead: {
@@ -244,19 +252,51 @@ Page {
 
 	onMarkLast: {
 		// no need to save parentEntry if this was the last one
-		if (parentEntry.last != undefined && parentEntry.last == parentEntry.items[current].id) {
+		if (parentEntry.last != undefined && parentEntry.last == parentEntry.items[parentEntry.currentIndex].id) {
 			return ;
 		}
 		// save last entry
-		parentEntry.last = parentEntry.items[current].id;
+		parentEntry.last = parentEntry.items[parentEntry.currentIndex].id;
 		saveEntry.activate();
 	}
 
+	onCalcCurrentCompletion: {
+		if (parentEntry.items.length > 0) {
+			if (entryView.indexAt(0, entryView.contentY + entryView.height) == entryView.count - 1) {
+				parentEntry.currentPage = parentEntry.items[parentEntry.items.length - 1].id;
+				parentEntry.currentCompletion = 1;
+				saveEntry.activate();
+			}
+			else {
+				var currentPartIndex = entryView.indexAt(0, entryView.contentY);
+				if (currentPartIndex != undefined && parentEntry.items[currentPartIndex] != undefined) {
+					parentEntry.currentPage = parentEntry.items[currentPartIndex].id;
+					parentEntry.currentCompletion = parentEntry.currentPage / parentEntry.items.length;
+					saveEntry.activate();
+				}
+			}
+		}
+	}
+
 	onGotoSibling: {
-		console.log('gotoSibling(' + number + '): ' + entryPage.parentEntry.items[number].id);
+		console.log('gotoSibling(' + number + '): ' + parentEntry.items[number].id);
 		entryView.model = [];
-		entryPage.current = number;
+		parentEntry.currentIndex = number;
+		parentEntry.currentPage = undefined;
+		parentEntry.currentCompletion = undefined;
+		prev = (parentEntry.currentIndex < 0 ? -1 : parentEntry.currentIndex - 1);
+		next = ((parentEntry.currentIndex + 1) < parentEntry.items.length ? parentEntry.currentIndex + 1 : -1);
+		console.log('gotoSibling(' + parentEntry.currentIndex + '): current: ' + parentEntry.items[parentEntry.currentIndex].id);
+		chapterLocator = parentEntry.locator.concat([{id: parentEntry.items[parentEntry.currentIndex].id, file: parentEntry.items[parentEntry.currentIndex].file, label: parentEntry.items[parentEntry.currentIndex].label}]);
+		console.log('gotoSibling(' + parentEntry.currentIndex + '): chapterLocator: ' + chapterLocator[chapterLocator.length - 1].id);
 		entryView.model = partModel;
 		loadChapter.activate();
+	}
+
+	onStatusChanged: {
+		if (status == PageStatus.Deactivating) {
+			// when going back, store the currentCompletion
+			calcCurrentCompletion();
+		}
 	}
 }
