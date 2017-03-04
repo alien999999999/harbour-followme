@@ -8,7 +8,7 @@
 		'pathQuery': "q=",
 		'pathQuerySuffix': "",
 		'preFilter': "",
-		'filter': "([^|]+)\|[^|]+\|[^|]+\|[^|]+\|/?([^|]+)\|.+[^]?",
+		'filter': "([^|]+)\|[^|]*\|[^|]*\|[^|]*\|/?([^|]+)\|.+[^]?",
 		'filterName': 1,
 		'filterFile': 2,
 		'filePrefix': "",
