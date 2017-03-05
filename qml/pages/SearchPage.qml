@@ -76,6 +76,9 @@ Page {
 				console.log('toggle (+save) entryItem: ');
 				console.log(entryItem);
 				entryItem.locator = [{id: entryItem.provider, label: entryItem.providerLabel}, {id:entryItem.id, label: entryItem.label}];
+				if (entryItem.items == undefined) {
+					entryItem.items = [];
+				}
 				saveEntry.save(entryItem);
 				if (entryItem.want) {
 					app.insertSort(entryItem);
