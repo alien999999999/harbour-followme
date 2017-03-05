@@ -29,11 +29,11 @@ download them in the background.
 %install
 rm -rf %{buildroot}
 
-mkdir -p %{buildroot}%{_datadir}/icons/hicolor/86x86/apps %{buildroot}%{_datadir}/applications %{buildroot}%{_datadir}/%{name}
+mkdir -p %{buildroot}%{_datadir}/icons/hicolor/86x86/apps %{buildroot}%{_datadir}/applications %{buildroot}%{_datadir}/%{name}/translations
 install %{name}.png %{buildroot}%{_datadir}/icons/hicolor/86x86/apps
 install %{name}.desktop %{buildroot}%{_datadir}/applications
 install %{name}.svg %{buildroot}%{_datadir}/%{name}
-cp -R qml python %{buildroot}%{_datadir}/%{name}/
+cp -R qml python translations %{buildroot}%{_datadir}/%{name}/
 
 desktop-file-install --delete-original --dir %{buildroot}%{_datadir}/applications %{buildroot}%{_datadir}/applications/*.desktop
 
