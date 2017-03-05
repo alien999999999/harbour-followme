@@ -80,11 +80,10 @@ Item {
 		if (item == undefined) {
 			return '';
 		}
-		var p1 = item['originator'][item['originator'].length - 1];
-		p1 = p1.label != undefined ? p1.label : p1.id;
-		var p2 = item['locator'].length > item['originator'].length ? item['locator'][item['originator'].length] : undefined;
-		p2 = p2 == undefined ? '' : ' (' + (p2.label != undefined ? p2.label : p2.id) + ')';
-		// TODO: add a label type for originator before the rest of the text (ie: Chapter)
+		var p1 = item['locator'][1];
+		p1 = ( p1 == undefined ? (item['locator'][0].label != undefined ? item['locator'][0].label : item['locator'][0].id) : (p1.label != undefined ? p1.label : p1.id) );
+		var p2 = item['locator'].length > 2 ? item['locator'][2] : undefined;
+		p2 = ( p2 == undefined ? '' : ' (' + qsTr('Chapter') + ' ' + (p2.label != undefined ? p2.label : p2.id) + ')');
 		return p1 + p2;
 	}
 
