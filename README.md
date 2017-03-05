@@ -1,5 +1,6 @@
 # harbour-followme
-SailfishOS FollowMe program
+FollowMe:
+SailfishOS Manga/Comic online/offline reader 
 
 FollowMe is an app for reading Manga/Comics and keeping track of all your followed Manga/Comics.
 
