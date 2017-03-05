@@ -105,6 +105,7 @@ Ajax {
 			// if provider is needed in the entry, add it
 			if (needProvider) {
 				entry['provider'] = locator[0].id;
+				entry['providerLabel'] = locator[0].label;
 			}
 
 			// set lastIndex correctly for next loop
