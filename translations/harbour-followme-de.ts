@@ -5,38 +5,38 @@
     <name>EntryPage</name>
     <message>
         <location filename="../qml/pages/EntryPage.qml" line="37"/>
-        <source>Chapter</source>
+        <source>Kapitel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/pages/EntryPage.qml" line="109"/>
-        <source>Refresh</source>
+        <source>Erneuern</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/pages/EntryPage.qml" line="121"/>
-        <source>Jump To</source>
+        <source>Springe zu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/pages/EntryPage.qml" line="124"/>
-        <source>Jump to chapter</source>
+        <source>Springe zu Kapitel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/pages/EntryPage.qml" line="126"/>
-        <source>chapter</source>
+        <source>Kapitel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/pages/EntryPage.qml" line="137"/>
         <location filename="../qml/pages/EntryPage.qml" line="150"/>
-        <source>Next</source>
+        <source>Nächstes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/pages/EntryPage.qml" line="142"/>
-        <source>Previous</source>
+        <source>Vorheriges</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -49,23 +49,23 @@
     </message>
     <message>
         <location filename="../qml/pages/MainPage.qml" line="71"/>
-        <source>Settings</source>
+        <source>Einstellungen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/pages/MainPage.qml" line="86"/>
-        <source>Stop downloading</source>
+        <source>Herunterladen stoppen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/pages/MainPage.qml" line="90"/>
-        <source>Browse</source>
+        <source>Stöbern</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/pages/MainPage.qml" line="94"/>
         <location filename="../qml/pages/MainPage.qml" line="97"/>
-        <source>Search</source>
+        <source>Suchen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -76,32 +76,32 @@
     <message>
         <location filename="../qml/pages/MainPage.qml" line="104"/>
         <location filename="../qml/pages/MainPage.qml" line="236"/>
-        <source>Check updates</source>
+        <source>Auf Updates prüfen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/pages/MainPage.qml" line="249"/>
-        <source>Download some chapters</source>
+        <source>Einige Kapitel herunterladen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/pages/MainPage.qml" line="261"/>
-        <source>Download until chapter</source>
+        <source>Herunterladen bis Kapitel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/pages/MainPage.qml" line="263"/>
-        <source>chapter</source>
+        <source>Kapitel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/pages/MainPage.qml" line="283"/>
-        <source>Cleanup read chapters</source>
+        <source>Gelesene Kapitel bereinigen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/pages/MainPage.qml" line="310"/>
-        <source>Stop following</source>
+        <source>Nicht mehr folgen</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -109,7 +109,7 @@
     <name>ProviderPage</name>
     <message>
         <location filename="../qml/pages/ProviderPage.qml" line="45"/>
-        <source>Refresh</source>
+        <source>Neu laden</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -118,7 +118,7 @@
     <message>
         <location filename="../qml/pages/SearchDialog.qml" line="19"/>
         <location filename="../qml/pages/SearchDialog.qml" line="25"/>
-        <source>Search</source>
+        <source>Suchen</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -126,7 +126,7 @@
     <name>SearchPage</name>
     <message>
         <location filename="../qml/pages/SearchPage.qml" line="31"/>
-        <source>Search for </source>
+        <source>Suchen nach </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -134,17 +134,17 @@
     <name>SettingsDialog</name>
     <message>
         <location filename="../qml/pages/SettingsDialog.qml" line="14"/>
-        <source>FollowMe settings</source>
+        <source>FollowMe Einstellungen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/pages/SettingsDialog.qml" line="20"/>
-        <source>This data path will be used to store the images as well as the tracking data of all the followed entries. Keep in mind that if you change the data path after using the application, you will have to move the data manually.</source>
+        <source>Dieser Dateipfad wird verwendet, um sowohl die Bilder als auch die Tracking-Daten der Einträge zu speichern. Bedenken Sie, dass Sie Dateien, die bei der Nutzung der App angelegt wurden, nach dem Ändern dieses Pfads manuell verschieben müssen.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/pages/SettingsDialog.qml" line="28"/>
-        <source>Data path</source>
+        <source>Dateipfad</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
