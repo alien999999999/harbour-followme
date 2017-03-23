@@ -58,12 +58,12 @@ Page {
 			running: true
 			interactionMode: TouchInteraction.Pull
 			direction: TouchInteraction.Down
-			visible: entryList.count == 0
+			visible: entryList.count == 0 && !entryList.loading
 		}
 
 		InteractionHintLabel {
 			text: "Pull to find something to follow"
-			visible: entryList.count == 0
+			visible: entryList.count == 0 && !entryList.loading
 		}
 
 		PullDownMenu {
